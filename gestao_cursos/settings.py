@@ -26,6 +26,7 @@ SECRET_KEY = 'django-insecure-y=dtvl!!d92u_@**8p6fbk2mfu47ra(2iq--@4gze+q-$uz^6@
 DEBUG = True
 
 ALLOWED_HOSTS = ["gestao-cursos-webapp.azurewebsites.net"]
+CSRF_TRUSTED_ORIGINS = ['https://*.gestao-cursos-webapp.azurewebsites.net','https://*.127.0.0.1']
 
 
 # Application definition
