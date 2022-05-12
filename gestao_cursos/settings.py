@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-y=dtvl!!d92u_@**8p6fbk2mfu47ra(2iq--@4gze+q-$uz^6@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["gestao-cursos-webapp.azurewebsites.net"]
+ALLOWED_HOSTS = ["gestao-cursos-webapp.azurewebsites.net", '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['https://*.gestao-cursos-webapp.azurewebsites.net','https://*.127.0.0.1']
 
 
@@ -125,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'America/Belem'
 
@@ -137,7 +137,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = "static"
+STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
