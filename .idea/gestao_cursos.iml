@@ -15,6 +15,16 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/static/assets/vendor/@popperjs/core/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/static/assets/vendor/bootstrap/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/static/assets/vendor/chartist/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/static/assets/vendor/chartist-plugin-tooltips/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/static/assets/vendor/onscreen/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/static/assets/vendor/simplebar/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/static/assets/vendor/smooth-scroll/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/static/assets/vendor/sweetalert2/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/static/assets/vendor/vanillajs-datepicker/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/static/assets/vendor/waypoints/lib" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10 (gestao_cursos)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
