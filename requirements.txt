@@ -1,5 +1,4 @@
 asgiref==3.5.1
-django-admin-volt==0.0.5
 Django==4.0.4
 pip==21.3.1
 psycopg2==2.9.3
