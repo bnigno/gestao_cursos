@@ -48,7 +48,7 @@ class ProfessorListView(ListView):
 class ProfessorCreateView(SuccessMessageMixin, CreateView):
     model = Professor
     fields = ["nome", "cpf"]
-    success_url = reverse_lazy("cadastrar-professores")
+    success_url = reverse_lazy("listar-professores")
     success_message = "Professor %(nome)s criado com sucesso."
 
 
