@@ -149,3 +149,30 @@ class DadosPagamentoUpdateView(SuccessMessageMixin, UpdateView):
                 return redirect(reverse("listar-alunos"))
 
         return redirect(reverse("listar-professores"))
+
+
+class AlunoListView(ListView):
+    model = Aluno
+    template_name = "cursos/aluno_list.html"
+
+
+class AlunoCreateView(SuccessMessageMixin, CreateView):
+    model = Aluno
+    fields = ["nome", "cpf"]
+    success_url = reverse_lazy("listar-alunos")
+    success_message = "Aluno %(nome)s criado com sucesso."
+
+
+class AlunoUpdateView(SuccessMessageMixin, UpdateView):
+    model = Aluno
+    fields = ["nome", "cpf"]
+    success_message = "Aluno %(nome)s alterado com sucesso."
+    template_name = "cursos/aluno_form_update.html"
+    success_url = reverse_lazy('listar-alunos')
+
+
+class AlunoDeleteView(SuccessMessageMixin, DeleteView):
+    model = Aluno
+    success_message = "Aluno removido com sucesso."
+    template_name = "cursos/aluno_form_delete.html"
+    success_url = reverse_lazy('listar-alunos')

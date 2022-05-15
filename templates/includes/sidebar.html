@@ -84,8 +84,8 @@
                           <span class="sidebar-text">Professores</span>
                       </a>
                   </li>
-                  <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
-                      <a href="{% url 'home' %}" class="nav-link">
+                  <li class="nav-item {% if request.path|startswith:'/alunos/' %} active {% endif %}">
+                      <a href="{% url 'listar-alunos' %}" class="nav-link">
                   <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
                       <i class="icon icon-xs me-2 fa-solid fa-user-graduate"></i>
                   </span>

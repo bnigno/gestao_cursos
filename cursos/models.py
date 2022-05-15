@@ -48,8 +48,9 @@ class Professor(models.Model):
 
 class Aluno(models.Model):
     nome = models.CharField(max_length=200, verbose_name="Nome")
-    cpf = models.CharField(max_length=50, null=True, unique=True, verbose_name="CPF")
-    dados_pagamento = models.ForeignKey(DadosPagamentos, on_delete=models.PROTECT, verbose_name="Dados de pagamento")
+    cpf = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name="CPF")
+    dados_pagamento = models.ForeignKey(DadosPagamentos, null=True, blank=True, on_delete=models.PROTECT,
+                                        verbose_name="Dados de pagamento")
 
     def __str__(self):
         return self.nome.capitalize()
