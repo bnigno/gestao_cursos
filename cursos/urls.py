@@ -15,5 +15,7 @@ urlpatterns = [
     path('professores/cadastrar/', views.ProfessorCreateView.as_view(), name='cadastrar-professores'),
     path('professores/<pk>/', views.ProfessorUpdateView.as_view(), name='gerenciar-professor'),
     path('professores/<pk>/deletar/', views.ProfessorDeleteView.as_view(), name='deletar-professor'),
+    path('dados-pagamento/cadastrar/', views.DadosPagamentoCreateView.as_view(), name='cadastrar-dados-pagamentos'),
+    path('dados-pagamento/<pk>/', views.DadosPagamentoUpdateView.as_view(), name='gerenciar-dados-pagamentos'),
 
 ]

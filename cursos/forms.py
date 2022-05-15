@@ -12,4 +12,4 @@ class ProfessorForm(forms.ModelForm):
 class DadosPagamentosForm(forms.ModelForm):
     class Meta:
         model = DadosPagamentos
-        fields = '__all__'
+        fields = ('tipo_pagamento', 'chave_pix', 'banco', 'agencia', 'conta', 'tipo_conta')

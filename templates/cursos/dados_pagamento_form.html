@@ -1,0 +1,25 @@
+{% load crispy_forms_tags %}
+<div class="modal-header">
+    <h2 class="h6 modal-title">Dados de Pagamento
+        {% if professor %}
+            - {{ professor.nome }}
+        {% elif aluno %}
+            - {{ aluno.nome }}
+        {% endif %}
+    </h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <form method="post" action="{% url 'cadastrar-dados-pagamentos' %}">
+        {% csrf_token %}
+        <input type="hidden" name="professor_id" value="{{ professor.id|default_if_none:"" }}">
+        <input type="hidden" name="aluno_id" value="{{ aluno.id|default_if_none:"" }}">
+        {{ form|crispy }}
+        <br>
+        <input type="submit" class="btn btn-primary">
+    </form>
+</div>
+{#<div class="modal-footer">#}
+{#    <button type="button" class="btn btn-secondary">Accept</button>#}
+{#    <button type="button" class="btn btn-link text-gray ms-auto" data-bs-dismiss="modal">Close</button>#}
+{#</div>#}

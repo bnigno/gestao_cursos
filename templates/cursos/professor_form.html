@@ -1,4 +1,5 @@
 {% extends "layouts/base.html" %}
+{% load crispy_forms_tags %}
 
 {% block title %} Cadastrar Professor {% endblock %}
 
@@ -38,7 +39,7 @@
                     <div class="row mb-4">
                         <form method="post" action="{% url 'cadastrar-professores' %}">
                             {% csrf_token %}
-                            {{ form.as_p }}
+                            {{ form|crispy }}
                             <input type="submit" class="btn btn-primary">
                         </form>
                         <!-- End of Form -->

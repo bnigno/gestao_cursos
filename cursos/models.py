@@ -21,11 +21,11 @@ class DadosPagamentos(models.Model):
         (2, 'Poupança'),
     ]
     tipo_pagamento = models.ForeignKey(TiposPagamentos, on_delete=models.CASCADE, verbose_name="Tipo de pagamento")
-    chave_pix = models.CharField(max_length=300, null=True, verbose_name="Chave PIX")
-    banco = models.CharField(max_length=100, null=True, verbose_name="Nome do banco")
-    agencia = models.CharField(max_length=50, null=True, verbose_name="Agência bancária")
-    conta = models.CharField(max_length=100, null=True, verbose_name="Número da conta bancária")
-    tipo_conta = models.IntegerField(choices=tipos_conta, null=True, verbose_name="Tipo de conta bancária")
+    chave_pix = models.CharField(max_length=300, blank=True, null=True, verbose_name="Chave PIX")
+    banco = models.CharField(max_length=100, blank=True, null=True, verbose_name="Nome do banco")
+    agencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Agência bancária")
+    conta = models.CharField(max_length=100, blank=True, null=True, verbose_name="Número da conta bancária")
+    tipo_conta = models.IntegerField(choices=tipos_conta, blank=True, null=True, verbose_name="Tipo de conta bancária")
 
 
 class Curso(models.Model):
@@ -39,8 +39,8 @@ class Curso(models.Model):
 class Professor(models.Model):
     nome = models.CharField(max_length=200, verbose_name="Nome")
     cpf = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name="CPF")
-    dados_pagamento = models.ForeignKey(DadosPagamentos, null=True, blank=True, on_delete=models.PROTECT,
-                                        verbose_name="Dados de pagamento")
+    dados_pagamento = models.OneToOneField(DadosPagamentos, null=True, blank=True, on_delete=models.PROTECT,
+                                           verbose_name="Dados de pagamento")
 
     def __str__(self):
         return self.nome.capitalize()
