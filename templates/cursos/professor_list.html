@@ -1,0 +1,163 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Listar Professores {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/bs5/jq-3.6.0/jszip-2.5.0/dt-1.12.0/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.3/r-2.3.0/rg-1.2.0/rr-1.2.8/sc-2.0.6/sb-1.3.3/sp-2.0.1/sl-1.4.0/sr-1.1.1/datatables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/searchbuilder/1.3.3/css/searchBuilder.dataTables.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item">
+                    <a href="#">
+                        <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                    </a>
+                </li>
+                <li class="breadcrumb-item"><a href="{% url 'listar-professores' %}">Professores</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Listar</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">Professores</h1>
+                <p class="mb-0">Lista de professores cadastrados</p>
+            </div>
+            <div>
+                <a class="btn btn-lg btn-outline-primary" style="margin: 10px"
+                   href="{% url 'cadastrar-professores' %}">
+                    <i class="fa-solid fa-plus"></i> Adicionar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card border-0 shadow components-section">
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <table id="professor-list" class="table table-striped" style="width:100%">
+                            <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                {#                                <th>Dados de Pagamento</th>#}
+                                <th>Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for professor in object_list %}
+                                <tr>
+                                    <td>{{ professor.nome }}</td>
+                                    <td>{{ professor.cpf|default_if_none:"" }}</td>
+                                    {#                                    {% if professor.dados_pagamento %}#}
+                                    {#                                        <td>{{ professor.dados_pagamento.tipo_pagamento }}</td>#}
+                                    {#                                    {% else %}#}
+                                    {#                                        <td>-</td>#}
+                                    {#                                    {% endif %}#}
+                                    <td>
+                                        <a href="{% url 'gerenciar-professor' pk=professor.id %}" class="edit"
+                                           title="Editar" data-toggle="tooltip"><i
+                                                class="icon icon-sm fa-solid fa-pencil"></i></a>
+                                        <a href="{% url 'deletar-professor' pk=professor.id %}" class="delete"
+                                           title="Deletar" data-toggle="tooltip"><i
+                                                class="icon icon-sm fa-solid fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                {#                                <th>Dados de Pagamento</th>#}
+                                <th>Ações</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/v/bs5/jq-3.6.0/jszip-2.5.0/dt-1.12.0/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.3/r-2.3.0/rg-1.2.0/rr-1.2.8/sc-2.0.6/sb-1.3.3/sp-2.0.1/sl-1.4.0/sr-1.1.1/datatables.min.js"></script>
+    {#    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.12.0/i18n/pt-BR.json"></script>#}
+    <script>
+        $(document).ready(function () {
+            const table = $('#professor-list').DataTable(
+                {
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/pt-BR.json'
+                    },
+                    buttons: [
+                        {
+                            extend: 'copyHtml5',
+                            exportOptions: {
+                                columns: [0, -2]
+                            }
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            exportOptions: {
+                                columns: [0, -2]
+                            }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            exportOptions: {
+                                columns: [0, -2]
+                            }
+                        },
+                        {
+                            extend: 'print',
+                            exportOptions: {
+                                columns: [0, -2]
+                            }
+                        },
+                        {
+                            extend: 'searchBuilder',
+                            config: {
+                                depthLimit: 2,
+                                columns: [0, 1]
+                            }
+                        },
+                    ],
+                    {#colReorder: true,#}
+                    colReorder: {
+                        fixedColumnsRight: 1
+                    },
+                    {#rowReorder: true,#}
+                    dom: 'Blfrtip',
+                    stateSave: true,
+                    scrollX: true,
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, 'Todos'],
+                    ],
+                }
+            );
+        });
+    </script>
+{% endblock javascripts %}

@@ -18244,20 +18244,43 @@ label {
 
 .table th {
   font-weight: 500;
-  padding: 1rem; }
+  padding: 1rem;
+}
 
 .table td .progress {
   height: 3px;
   width: 120px;
-  margin: 0; }
+  margin: 0;
+}
+
+table.table td a {
+  cursor: pointer;
+  display: inline-block;
+  margin: 0 5px;
+  min-width: 24px;
+}
+
+table.table td a.edit {
+  color: #FFC107;
+}
+
+table.table td a.delete {
+  color: #E34724;
+}
+
+table.table td a.add {
+  color: #27C46B;
+}
 
 .table td,
 .table th {
   font-size: 0.875rem;
-  white-space: nowrap; }
+  white-space: nowrap;
+}
 
 .table.user-table thead th {
-  border-top: 0; }
+  border-top: 0;
+}
 
 .table.align-items-center td,
 .table.align-items-center th {
