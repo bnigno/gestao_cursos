@@ -1,13 +1,17 @@
-        <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
-            <a class="navbar-brand me-lg-5" href="/">
-                <img class="navbar-brand-dark" src="/static/assets/img/brand/light.svg" alt="Volt logo" /> <img class="navbar-brand-light" src="/static/assets/img/brand/dark.svg" alt="Volt logo" />
-            </a>
-            <div class="d-flex align-items-center">
-                <button class="navbar-toggler d-lg-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-            </div>
-        </nav>
+{% load startswith %}
+<nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
+    <a class="navbar-brand me-lg-5" href="/">
+        <img class="navbar-brand-dark" src="/static/assets/img/brand/light.svg" alt="Volt logo"/> <img
+            class="navbar-brand-light" src="/static/assets/img/brand/dark.svg" alt="Volt logo"/>
+    </a>
+    <div class="d-flex align-items-center">
+        <button class="navbar-toggler d-lg-none collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
 
         <nav id="sidebarMenu" class="sidebar d-lg-block bg-gray-800 text-white collapse" data-simplebar>
           <div class="sidebar-inner px-4 pt-3">
@@ -47,7 +51,7 @@
                           <span class="mt-1 ms-1 sidebar-text">Gestão de Cursos</span>
                       </a>
                   </li>
-                  <li class="nav-item {% if 'dashboard' in segment %} active {% endif %}">
+                  <li class="nav-item {% if request.path == '/' %} active {% endif %}">
                       <a href="{% url 'home' %}" class="nav-link">
                   <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
                       <i class="icon icon-xs me-2  fa-solid fa-house"></i>
@@ -72,7 +76,7 @@
                       </a>
                   </li>
                   <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
-                  <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
+                  <li class="nav-item {% if request.path|startswith:'/professores/' %} active {% endif %}">
                       <a href="{% url 'listar-professores' %}" class="nav-link">
                   <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
                       <i class="icon icon-xs me-2 fa-solid fa-chalkboard-user"></i>
