@@ -30,7 +30,7 @@ class DadosPagamentos(models.Model):
 
 class Curso(models.Model):
     nome = models.CharField(max_length=200, verbose_name="Nome")
-    carga_horaria = models.IntegerField(verbose_name="Carga Horária")
+    carga_horaria = models.IntegerField(verbose_name="Carga Horária (h)")
 
     def __str__(self):
         return self.nome.capitalize()

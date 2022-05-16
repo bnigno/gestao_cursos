@@ -8,7 +8,7 @@ from django.template import loader
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 
-from cursos.models import Professor, DadosPagamentos, Aluno
+from cursos.models import Professor, DadosPagamentos, Aluno, Curso
 
 
 @login_required(login_url="/login/")
@@ -176,3 +176,30 @@ class AlunoDeleteView(SuccessMessageMixin, DeleteView):
     success_message = "Aluno removido com sucesso."
     template_name = "cursos/aluno_form_delete.html"
     success_url = reverse_lazy('listar-alunos')
+
+
+class CursoListView(ListView):
+    model = Curso
+    template_name = "cursos/curso_list.html"
+
+
+class CursoCreateView(SuccessMessageMixin, CreateView):
+    model = Curso
+    fields = ["nome", "carga_horaria"]
+    success_url = reverse_lazy("listar-cursos")
+    success_message = "Curso %(nome)s criado com sucesso."
+
+
+class CursoUpdateView(SuccessMessageMixin, UpdateView):
+    model = Curso
+    fields = ["nome", "carga_horaria"]
+    success_message = "Curso %(nome)s alterado com sucesso."
+    template_name = "cursos/curso_form_update.html"
+    success_url = reverse_lazy('listar-cursos')
+
+
+class CursoDeleteView(SuccessMessageMixin, DeleteView):
+    model = Curso
+    success_message = "Curso removido com sucesso."
+    template_name = "cursos/curso_form_delete.html"
+    success_url = reverse_lazy('listar-cursos')

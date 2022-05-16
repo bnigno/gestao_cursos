@@ -59,8 +59,8 @@
                           <span class="sidebar-text">Inicio</span>
                       </a>
                   </li>
-                  <li class="nav-item {% if 'transactions' in segment %} active {% endif %}">
-                      <a href="{% url 'home' %}" class="nav-link">
+                  <li class="nav-item {% if request.path|startswith:'/cursos/' %} active {% endif %}">
+                      <a href="{% url 'listar-cursos' %}" class="nav-link">
                   <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
                       <i class="icon icon-xs me-2 fa-solid fa-graduation-cap"></i>
                   </span>
