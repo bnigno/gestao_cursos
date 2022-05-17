@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import CheckConstraint, Q, F
 
 
 class Municipio(models.Model):
@@ -57,18 +58,25 @@ class Aluno(models.Model):
 
 
 class Turma(models.Model):
-    nome = models.CharField(max_length=200, verbose_name="Nome")
     curso = models.ForeignKey(Curso, on_delete=models.PROTECT, verbose_name="Curso")
     professor = models.ForeignKey(Professor, on_delete=models.PROTECT, verbose_name="Professor")
     municipio = models.ForeignKey(Municipio, on_delete=models.PROTECT, verbose_name="Município")
     dt_inicio = models.DateField(verbose_name="Data de inicio")
     dt_fim = models.DateField(verbose_name="Data de encerramento")
-    valor_lanche = models.FloatField(verbose_name="Valor do lanche")
-    valor_transporte = models.FloatField(verbose_name="Valor do Transporte")
+    valor_lanche = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Valor do lanche por dia")
+    valor_transporte = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Valor do Transporte por aluno")
     alunos = models.ManyToManyField(Aluno, related_name="turmas")
 
     def __str__(self):
-        return self.nome.capitalize()
+        return f"{self.curso.nome.capitalize()} - {self.municipio.nome} - {self.professor.nome} - {self.dt_inicio.strftime('%d/%m/%Y')} - {self.dt_fim.strftime('%d/%m/%Y')}"
+
+    class Meta:
+        constraints = [
+            CheckConstraint(
+                check=Q(dt_fim__gte=F("dt_inicio")),
+                name="dt_fim_greater",
+            ),
+        ]
 
 
 class Frequencia(models.Model):

@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
@@ -7,8 +9,10 @@ from django.shortcuts import redirect
 from django.template import loader
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from workadays import workdays as wd
 
-from cursos.models import Professor, DadosPagamentos, Aluno, Curso
+from cursos.forms import TurmaForm
+from cursos.models import Professor, DadosPagamentos, Aluno, Curso, Turma, Frequencia
 
 
 @login_required(login_url="/login/")
@@ -203,3 +207,80 @@ class CursoDeleteView(SuccessMessageMixin, DeleteView):
     success_message = "Curso removido com sucesso."
     template_name = "cursos/curso_form_delete.html"
     success_url = reverse_lazy('listar-cursos')
+
+
+class TurmaListView(ListView):
+    model = Turma
+    queryset = Turma.objects.select_related("curso", "professor", "municipio").all()
+    template_name = "cursos/turma_list.html"
+
+
+class TurmaCreateView(SuccessMessageMixin, CreateView):
+    model = Turma
+    # fields = ['curso', 'municipio', 'dt_inicio', 'dt_fim', 'professor', 'nome', 'valor_lanche', 'valor_transporte', 'alunos']
+    template_name = "cursos/turma_form.html"
+    form_class = TurmaForm
+    success_url = reverse_lazy("listar-turmas")
+    success_message = "Turma criada com sucesso."
+
+    def form_valid(self, form):
+        success_message = self.get_success_message(form.cleaned_data)
+        with transaction.atomic():
+            self.object = form.save()
+
+            start_date = self.object.dt_inicio
+            end_date = self.object.dt_fim
+            delta = datetime.timedelta(days=1)
+
+            while start_date <= end_date:
+                frequencia = Frequencia()
+                frequencia.turma = self.object
+                frequencia.data = start_date
+                frequencia.has_aula = wd.is_workday(start_date, country='BR', state="PA")
+                frequencia.save()
+                start_date += delta
+
+        if success_message:
+            messages.success(self.request, success_message)
+        return redirect(reverse("listar-turmas"))
+
+
+class TurmaUpdateView(SuccessMessageMixin, UpdateView):
+    model = Turma
+    # fields = ['curso', 'municipio', 'dt_inicio', 'dt_fim', 'professor', 'nome', 'valor_lanche', 'valor_transporte', 'alunos']
+    template_name = "cursos/turma_form_update.html"
+    form_class = TurmaForm
+    success_url = reverse_lazy("listar-turmas")
+    success_message = "Turma criada com sucesso."
+
+    def form_valid(self, form):
+        success_message = self.get_success_message(form.cleaned_data)
+        with transaction.atomic():
+            self.object = form.save()
+
+            start_date = self.object.dt_inicio
+            end_date = self.object.dt_fim
+            delta = datetime.timedelta(days=1)
+
+            Frequencia.objects.filter(turma=self.object, data__lt=start_date).delete()
+            Frequencia.objects.filter(turma=self.object, data__gt=end_date).delete()
+
+            while start_date <= end_date:
+                if not Frequencia.objects.filter(turma=self.object, data=start_date).exists():
+                    frequencia = Frequencia()
+                    frequencia.turma = self.object
+                    frequencia.data = start_date
+                    frequencia.has_aula = wd.is_workday(start_date, country='BR', state="PA")
+                    frequencia.save()
+                start_date += delta
+
+        if success_message:
+            messages.success(self.request, success_message)
+        return redirect(reverse("listar-turmas"))
+
+
+class TurmaDeleteView(SuccessMessageMixin, DeleteView):
+    model = Turma
+    success_message = "Turma removida com sucesso."
+    template_name = "cursos/turma_form_delete.html"
+    success_url = reverse_lazy('listar-turmas')

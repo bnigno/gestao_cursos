@@ -30,4 +30,9 @@ urlpatterns = [
     path('cursos/<pk>/', views.CursoUpdateView.as_view(), name='gerenciar-curso'),
     path('cursos/<pk>/deletar/', views.CursoDeleteView.as_view(), name='deletar-curso'),
 
+    path('turmas/', views.TurmaListView.as_view(), name='listar-turmas'),
+    path('turmas/cadastrar/', views.TurmaCreateView.as_view(), name='cadastrar-turmas'),
+    path('turmas/<pk>/', views.TurmaUpdateView.as_view(), name='gerenciar-turma'),
+    path('turmas/<pk>/deletar/', views.TurmaDeleteView.as_view(), name='deletar-turma'),
+
 ]

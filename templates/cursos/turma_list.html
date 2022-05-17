@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Listar Professores {% endblock %}
+{% block title %} Listar Turmas {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
@@ -27,18 +27,18 @@
                         </svg>
                     </a>
                 </li>
-                <li class="breadcrumb-item"><a href="{% url 'listar-professores' %}">Professores</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'listar-turmas' %}">Turmas</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Listar</li>
             </ol>
         </nav>
         <div class="d-flex justify-content-between w-100 flex-wrap">
             <div class="mb-3 mb-lg-0">
-                <h1 class="h4">Professores</h1>
-                <p class="mb-0">Lista de professores cadastrados</p>
+                <h1 class="h4">Turmas</h1>
+                <p class="mb-0">Lista de turmas cadastradas</p>
             </div>
             <div>
                 <a class="btn btn-lg btn-outline-primary" style="margin: 10px"
-                   href="{% url 'cadastrar-professores' %}">
+                   href="{% url 'cadastrar-turmas' %}">
                     <i class="fa-solid fa-plus"></i> Adicionar
                 </a>
             </div>
@@ -50,55 +50,37 @@
             <div class="card border-0 shadow components-section">
                 <div class="card-body">
                     <div class="row mb-4">
-                        <table id="professor-list" class="table table-hover table-centered table-nowrap mb-0 rounded"
+                        <table id="turma-list" class="table table-hover table-centered table-nowrap mb-0 rounded"
                                style="width:100%">
                             <thead class="thead-light">
                             <tr>
-                                <th class="border-0 rounded-start">Nome</th>
-                                <th class="border-0">CPF</th>
-                                <th class="border-0">Dados de Pagamento</th>
+                                <th class="border-0 rounded-start">Curso</th>
+                                <th class="border-0">Professor</th>
+                                <th class="border-0">Município</th>
+                                <th class="border-0">Data de Início</th>
+                                <th class="border-0">Data de Fim</th>
+                                <th class="border-0">Nº de Alunos</th>
+                                <th class="border-0">Valor Lanche</th>
+                                <th class="border-0">Valor Transporte</th>
                                 <th class="border-0 rounded-end">Ações</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {% for professor in object_list %}
+                            {% for turma in object_list %}
                                 <tr>
-                                    <td class="border-0">{{ professor.nome }}</td>
-                                    <td class="border-0">{{ professor.cpf|default_if_none:"" }}</td>
-                                    {% if professor.dados_pagamento %}
-                                        {% if professor.dados_pagamento.tipo_pagamento.nome|lower == "pix" %}
-                                            <td class="border-0">{{ professor.dados_pagamento.tipo_pagamento }}: {{ professor.dados_pagamento.chave_pix|default_if_none:"Sem chave" }}</td>
-                                        {% elif professor.dados_pagamento.tipo_pagamento.nome|lower == "depósito em conta" %}
-                                            <td class="border-0">{{ professor.dados_pagamento.tipo_pagamento }}: {{ professor.dados_pagamento.banco|default_if_none:"" }}
-                                                - Agência: {{ professor.dados_pagamento.conta|default_if_none:"" }} -
-                                                Conta: {{ professor.dados_pagamento.conta|default_if_none:"" }} - Tipo
-                                                de
-                                                Conta: {{ professor.dados_pagamento.tipo_conta|default_if_none:"" }}</td>
-                                        {% elif professor.dados_pagamento.tipo_pagamento.nome|lower == "espécie" %}
-                                            <td class="border-0">{{ professor.dados_pagamento.tipo_pagamento }}</td>
-                                        {% endif %}
-                                    {% else %}
-                                        <td class="border-0"></td>
-                                    {% endif %}
+                                    <td class="border-0">{{ turma.curso }}</td>
+                                    <td class="border-0">{{ turma.professor }}</td>
+                                    <td class="border-0">{{ turma.municipio }}</td>
+                                    <td class="border-0">{{ turma.dt_inicio|date:'Y-m-d' }} 03:00:00</td>
+                                    <td class="border-0">{{ turma.dt_fim|date:'Y-m-d' }} 03:00:00</td>
+                                    <td class="border-0">{{ turma.alunos.count }}</td>
+                                    <td class="border-0">{{ turma.valor_lanche }}</td>
+                                    <td class="border-0">{{ turma.valor_transporte }}</td>
                                     <td class="border-0">
-                                        {% if professor.dados_pagamento %}
-                                            <a data-toggle="modal" data-target="#modal-pagamento"
-                                               href="{% url 'gerenciar-dados-pagamentos' pk=professor.dados_pagamento.id %}?professor={{ professor.id }}"
-                                               class="add a-modal"
-                                               title="Dados de Pagamento">
-                                        {% else %}
-                                            <a data-toggle="modal" data-target="#modal-pagamento"
-                                               href="{% url 'cadastrar-dados-pagamentos' %}?professor={{ professor.id }}"
-                                               class="add a-modal"
-                                               title="Dados de Pagamento">
-                                        {% endif %}
-
-                                        <i class=" icon icon-sm fa-solid fa-money-check-dollar"></i>
-                                        </a>
-                                        <a href="{% url 'gerenciar-professor' pk=professor.id %}" class="edit"
+                                        <a href="{% url 'gerenciar-turma' pk=turma.id %}" class="edit"
                                            title="Editar" data-toggle="tooltip"><i
                                                 class="icon icon-sm fa-solid fa-pencil"></i></a>
-                                        <a href="{% url 'deletar-professor' pk=professor.id %}" class="delete"
+                                        <a href="{% url 'deletar-turma' pk=turma.id %}" class="delete"
                                            title="Deletar" data-toggle="tooltip"><i
                                                 class="icon icon-sm fa-solid fa-trash"></i></a>
                                     </td>
@@ -128,9 +110,17 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
     <script type="text/javascript"
             src="https://cdn.datatables.net/v/bs5/jq-3.6.0/jszip-2.5.0/dt-1.12.0/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.3/r-2.3.0/rg-1.2.0/rr-1.2.8/sc-2.0.6/sb-1.3.3/sp-2.0.1/sl-1.4.0/sr-1.1.1/datatables.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+
+    {#    <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.12.0/type-detection/date-uk.js"></script>#}
+    <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.12.0/dataRender/ellipsis.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.12.0/dataRender/intl.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.12.0/sorting/datetime-moment.js"></script>
+
     <script>
         $(document).ready(function () {
-            const table = $('#professor-list').DataTable(
+            $.fn.dataTable.moment('DD/MM/YYYY');
+            let table = $('#turma-list').DataTable(
                 {
                     language: {
                         url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/pt-BR.json'
@@ -173,20 +163,25 @@
                         fixedColumnsRight: 1
                     },
                     {#rowReorder: true,#}
+                    {#dom: 'Qlfrtip',#}
+
                     dom: 'Blfrtip',
                     stateSave: false,
                     scrollX: true,
+                    order: [[3, 'desc']],
                     lengthMenu: [
                         [10, 25, 50, -1],
                         [10, 25, 50, 'Todos'],
                     ],
+                    columnDefs: [
+                        {
+                            targets: [3, 4],
+                            render: function (data) {
+                                return moment(data, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                            }
+                        }]
                 }
             );
-        });
-
-        $('.a-modal').on('click', function (e) {
-            e.preventDefault();
-            $('#modal-pagamento').modal('show').find('.modal-content').load($(this).attr('href'));
         });
     </script>
 {% endblock javascripts %}

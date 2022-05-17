@@ -35,6 +35,8 @@
     <orderEntry type="library" name="jquery.mask" level="application" />
     <orderEntry type="library" name="searchBuilder.dataTables" level="application" />
     <orderEntry type="library" name="buttons.dataTables" level="application" />
+    <orderEntry type="library" name="select2" level="application" />
+    <orderEntry type="library" name="datetime" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
