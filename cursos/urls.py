@@ -34,5 +34,8 @@ urlpatterns = [
     path('turmas/cadastrar/', views.TurmaCreateView.as_view(), name='cadastrar-turmas'),
     path('turmas/<pk>/', views.TurmaUpdateView.as_view(), name='gerenciar-turma'),
     path('turmas/<pk>/deletar/', views.TurmaDeleteView.as_view(), name='deletar-turma'),
+    path('turmas/<pk>/frequencia/', views.PresencaView.as_view(), name='visualizar-frequencia'),
+    path('turmas/<pk>/frequencia/editar/', views.FrequenciaUpdateView.as_view(), name='gerenciar-frequencia'),
+    path('presencas/', views.PresencaUpdateLoteView.as_view(), name='salvar-presencas'),
 
 ]

@@ -1,0 +1,45 @@
+<div class="modal-header">
+    <h2 class="h6 modal-title">Frequência: {{ object }}</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <form method="post" action="{% url 'cadastrar-dados-pagamentos' %}">
+        {% csrf_token %}
+        <table id="turma-list" class="table table-hover table-centered table-nowrap mb-0 rounded"
+               style="width:100%">
+            <thead class="thead-light">
+            <tr>
+                <th>Aluno</th>
+                {% for dia in frequencias %}
+                    <th>{{ dia.data|date:'d/m' }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Houve aula?</td>
+                {% for dia in frequencias %}
+                    <td>
+                        <input class="form-check-input" type="checkbox" id="id_has_aula_frequencia_{{ dia.id }}"
+                                {% if dia.has_aula %} checked {% endif %}>
+                    </td>
+                {% endfor %}
+            </tr>
+            {% for aluno in alunos %}
+                <tr>
+                    <td>{{ aluno.nome }}</td>
+                    {% for presenca in aluno.presencas %}
+                        <td><input class="form-check-input" type="checkbox"
+                                   id="id_presente_frequencia_{{ presenca.freq_id }}_aluno_{{ aluno.id }}"
+                                {% if presenca.presente %} checked {% endif %}></td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</div>
+<div class="modal-footer">
+    <input type="submit" class="btn btn-primary">
+    <button type="button" class="btn btn-gray-200" data-bs-dismiss="modal">Fechar</button>
+</div>

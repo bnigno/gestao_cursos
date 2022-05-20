@@ -1,0 +1,152 @@
+{% extends "layouts/base.html" %}
+{% load crispy_forms_tags %}
+{% load l10n %}
+
+{% block title %} Gerencia Frequência {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+            integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://unpkg.com/tabulator-tables@5.2.4/dist/css/tabulator.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.2.4/dist/js/tabulator.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.2.2/css/tabulator_bootstrap5.min.css"
+          rel="stylesheet" media="all">
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item">
+                    <a href="#">
+                        <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                    </a>
+                </li>
+                <li class="breadcrumb-item"><a href="{% url 'listar-turmas' %}">Turmas</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Editar</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">Gerenciar Frequência</h1>
+                <p class="mb-0">Turma: {{ object }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card border-0 shadow components-section">
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div id="frequencia-table"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    <script>
+        const tabledata = [
+            {
+                "nome": "Houve aula?",
+                "2022-05-01": false,
+                "2022-05-02": true,
+                "2022-05-03": true,
+                "2022-05-04": true,
+                "2022-05-05": true,
+                "2022-05-06": true,
+                "2022-05-07": false
+            },
+            {
+                "nome": "FABIANO B CARVALHO",
+                "2022-05-01": false,
+                "2022-05-02": false,
+                "2022-05-03": false,
+                "2022-05-04": false,
+                "2022-05-05": false,
+                "2022-05-06": false,
+                "2022-05-07": false
+            },
+            {
+                "nome": "Felipe Benigno de Carvalho",
+                "2022-05-01": false,
+                "2022-05-02": false,
+                "2022-05-03": false,
+                "2022-05-04": false,
+                "2022-05-05": false,
+                "2022-05-06": false,
+                "2022-05-07": false
+            },
+            {
+                "nome": "Josimar Lemos de Carvalho",
+                "2022-05-01": false,
+                "2022-05-02": false,
+                "2022-05-03": false,
+                "2022-05-04": false,
+                "2022-05-05": false,
+                "2022-05-06": false,
+                "2022-05-07": false
+            },
+            {
+                "nome": "Natércia bahia Benigno",
+                "2022-05-01": false,
+                "2022-05-02": false,
+                "2022-05-03": false,
+                "2022-05-04": false,
+                "2022-05-05": false,
+                "2022-05-06": false,
+                "2022-05-07": false
+            }
+        ]
+
+        //create Tabulator on DOM element with id "example-table"
+        $(document).ready(function () {
+            var table = new Tabulator("#frequencia-table", {
+                height: 205, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+                data: tabledata, //assign data to table
+                layout: "fitColumns", //fit columns to width of table (optional)
+                {#autoColumns:true#}
+                columns: [ //Define Table Columns
+                    {title: "Nome", field: "nome"},
+                    {
+                        title: "2022-05-01",
+                        field: "2022-05-01",
+                        formatter: "tickCross",
+                        editor: true,
+                        hozAlign: "center",
+                        vertAlign: "middle",
+                        headerSort: false
+                    },
+                    {
+                        title: "2022-05-02",
+                        field: "2022-05-02",
+                        formatter: "tickCross",
+                        editor: true,
+                        hozAlign: "center",
+                        vertAlign: "middle",
+                        headerSort: false
+                    },
+                    {title: "2022-05-03", field: "2022-05-03", formatter: "tickCross", editor: true},
+                    {title: "2022-05-04", field: "2022-05-04", formatter: "tickCross", editor: true},
+                    {title: "2022-05-05", field: "2022-05-05", formatter: "tickCross", editor: true},
+                    {title: "2022-05-06", field: "2022-05-06", formatter: "tickCross", editor: true},
+                    {title: "2022-05-07", field: "2022-05-07", formatter: "tickCross", editor: true},
+                ],
+            });
+        });
+
+    </script>
+{% endblock javascripts %}

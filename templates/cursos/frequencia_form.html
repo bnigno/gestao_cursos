@@ -1,0 +1,127 @@
+{% extends "layouts/base.html" %}
+{% load crispy_forms_tags %}
+{% load l10n %}
+
+{% block title %} Gerencia Frequência {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item">
+                    <a href="#">
+                        <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                    </a>
+                </li>
+                <li class="breadcrumb-item"><a href="{% url 'listar-turmas' %}">Turmas</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'gerenciar-turma' pk=object.id %}">{{ object }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Editar Frequência</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">Editar Frequência</h1>
+                <p class="mb-0">Turma: {{ object }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card border-0 shadow components-section">
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <form method="GET" class="row-cols-lg-auto">
+                                    <div id="div_id_data_list" class="form-group">
+                                        <label for="id_data_list" class=" requiredField">Selecione a data:</label>
+                                        <select name="data_list" class="select form-control" required=""
+                                                id="id_data_list">
+                                            {% for x, y in datas.fields.data_list.choices %}
+                                                <option value="{{ x|date:'Y-m-d' }}"
+                                                        {% if datas.fields.data_list.initial.0 == x %}
+                                                        selected{% endif %}>{% localize %}
+                                                    {{ y|date:'l, d \d\e F \d\e Y' }}{% endlocalize %}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <input type="submit" class="btn btn-primary" value="Definir data">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                    {% if data_selecionada %}
+                        <div class="row mb-4">
+                            <h4>Frequência de {{ data_selecionada|date:'l, d \d\e F \d\e Y' }}</h4>
+                            <form method="POST" action="{% url 'gerenciar-frequencia' pk=object.id %}"
+                                  class="row g-3 row-cols-lg-auto">
+                                {% csrf_token %}
+                                {{ form_presenca|crispy }}
+                                <input type="submit" class="btn btn-primary" value="Salvar">
+                            </form>
+                        </div>
+
+                        <div class="row mb-4">
+                            <h4>Alunos:</h4>
+                            <form method="POST" id="form_alunos" action="{% url 'salvar-presencas' %}"
+                                  class="row gy-2 gx-3 align-items-center ">
+                                {% csrf_token %}
+                                <input type="hidden" id="frequencia_id" name="frequencia_id"
+                                       value="{{ frequencia_id }}">
+                                {{ alunos_formset|crispy }}
+                                <input type="submit" class="btn btn-primary" value="Salvar">
+                            </form>
+
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+            integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        $(document).ready(function () {
+            if (!$("#id_has_aula").attr("checked")) {
+                console.log(!$("#id_has_aula").attr("checked"))
+                $("#form_alunos :input").prop("disabled", true);
+            }
+        });
+
+        $("#id_has_aula").change(function (evt) {
+            if (!this.checked) {
+                let answer = window.confirm("Deseja realmente marcar como sem aula?\nTodas as presenças serão removidas.");
+                if (answer) {
+                    $("#form_alunos :input").prop("checked", false);
+                    $("#form_alunos :input").prop("disabled", true);
+                } else {
+                    console.log(answer)
+                    evt.preventDefault();
+                    $("#id_has_aula").prop("checked", true);
+                }
+            }
+        });
+
+    </script>
+{% endblock javascripts %}

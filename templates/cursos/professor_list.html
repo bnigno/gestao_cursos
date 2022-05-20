@@ -85,21 +85,25 @@
                                             <a data-toggle="modal" data-target="#modal-pagamento"
                                                href="{% url 'gerenciar-dados-pagamentos' pk=professor.dados_pagamento.id %}?professor={{ professor.id }}"
                                                class="add a-modal"
-                                               title="Dados de Pagamento">
+                                               tabindex="0" data-bs-toggle="popover" data-bs-placement="top"
+                                               data-bs-trigger="hover focus" data-bs-content="Dados de Pagamento">
                                         {% else %}
                                             <a data-toggle="modal" data-target="#modal-pagamento"
                                                href="{% url 'cadastrar-dados-pagamentos' %}?professor={{ professor.id }}"
                                                class="add a-modal"
-                                               title="Dados de Pagamento">
+                                               tabindex="0" data-bs-toggle="popover" data-bs-placement="top"
+                                               data-bs-trigger="hover focus" data-bs-content="Dados de Pagamento">
                                         {% endif %}
 
                                         <i class=" icon icon-sm fa-solid fa-money-check-dollar"></i>
                                         </a>
                                         <a href="{% url 'gerenciar-professor' pk=professor.id %}" class="edit"
-                                           title="Editar" data-toggle="tooltip"><i
+                                           tabindex="0" data-bs-toggle="popover" data-bs-placement="top"
+                                           data-bs-trigger="hover focus" data-bs-content="Editar"><i
                                                 class="icon icon-sm fa-solid fa-pencil"></i></a>
                                         <a href="{% url 'deletar-professor' pk=professor.id %}" class="delete"
-                                           title="Deletar" data-toggle="tooltip"><i
+                                           tabindex="0" data-bs-toggle="popover" data-bs-placement="top"
+                                           data-bs-trigger="hover focus" data-bs-content="Deletar"><i
                                                 class="icon icon-sm fa-solid fa-trash"></i></a>
                                     </td>
                                 </tr>

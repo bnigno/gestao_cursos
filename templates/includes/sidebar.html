@@ -71,7 +71,7 @@
                           <span class="sidebar-text">Cursos</span>
                       </a>
                   </li>
-                  <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
+                  <li class="nav-item {% if request.path|startswith:'/turmas/' %} active {% endif %}">
                       <a href="{% url 'listar-turmas' %}" class="nav-link">
                   <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
                       <i class="icon icon-xs me-2 fa-solid fa-users"></i>

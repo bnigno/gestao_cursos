@@ -68,7 +68,7 @@ class Turma(models.Model):
     alunos = models.ManyToManyField(Aluno, related_name="turmas")
 
     def __str__(self):
-        return f"{self.curso.nome.capitalize()} - {self.municipio.nome} - {self.professor.nome} - {self.dt_inicio.strftime('%d/%m/%Y')} - {self.dt_fim.strftime('%d/%m/%Y')}"
+        return f"{self.curso.nome.title()} - {self.municipio.nome} - {self.professor.nome.title()} - {self.dt_inicio.strftime('%d/%m/%Y')} - {self.dt_fim.strftime('%d/%m/%Y')}"
 
     class Meta:
         constraints = [
@@ -88,7 +88,13 @@ class Frequencia(models.Model):
         unique_together = ["data", "turma"]
 
     def __str__(self):
-        return f"{self.turma.nome} - {self.data.strftime('%d/%m/%Y')}"
+        return f"{self.turma} - {self.data.strftime('%d/%m/%Y')}"
+
+    def save(self, *args, **kwargs):
+        if not self.has_aula:
+            self.alunos.update(presente=False)
+
+        super(Frequencia, self).save(*args, **kwargs)
 
 
 class FrequenciaAluno(models.Model):
@@ -96,7 +102,7 @@ class FrequenciaAluno(models.Model):
     frequencia = models.ForeignKey(
         Frequencia, on_delete=models.CASCADE, related_name="alunos"
     )
-    presente = models.BooleanField(help_text="O aluno estava presente?", default=True)
+    presente = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ["aluno", "frequencia"]

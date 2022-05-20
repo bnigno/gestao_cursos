@@ -66,10 +66,12 @@
                                     <td class="border-0">{{ curso.carga_horaria }}</td>
                                     <td class="border-0">
                                         <a href="{% url 'gerenciar-curso' pk=curso.id %}" class="edit"
-                                           title="Editar" data-toggle="tooltip"><i
+                                           tabindex="0" data-bs-toggle="popover" data-bs-placement="top"
+                                           data-bs-trigger="hover focus" data-bs-content="Editar"><i
                                                 class="icon icon-sm fa-solid fa-pencil"></i></a>
                                         <a href="{% url 'deletar-curso' pk=curso.id %}" class="delete"
-                                           title="Deletar" data-toggle="tooltip"><i
+                                           tabindex="0" data-bs-toggle="popover" data-bs-placement="top"
+                                           data-bs-trigger="hover focus" data-bs-content="Deletar"><i
                                                 class="icon icon-sm fa-solid fa-trash"></i></a>
                                     </td>
                                 </tr>

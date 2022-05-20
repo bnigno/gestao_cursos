@@ -15,10 +15,21 @@
 
 */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+.presente {
+  color: #10B981;
+}
+
+.ausente {
+  color: #E11D48;
+}
+
 .datepicker {
-  display: none; }
-  .datepicker.active {
-    display: block; }
+  display: none;
+}
+
+.datepicker.active {
+  display: block;
+}
 
 .datepicker-dropdown {
   position: absolute;
@@ -2494,15 +2505,27 @@ progress {
   .g-xxl-lg,
   .gx-xxl-lg {
     --bs-gutter-x: 4rem; }
+
   .g-xxl-lg,
   .gy-xxl-lg {
-    --bs-gutter-y: 4rem; }
+    --bs-gutter-y: 4rem;
+  }
+
   .g-xxl-xl,
   .gx-xxl-xl {
-    --bs-gutter-x: 8rem; }
+    --bs-gutter-x: 8rem;
+  }
+
   .g-xxl-xl,
   .gy-xxl-xl {
-    --bs-gutter-y: 8rem; } }
+    --bs-gutter-y: 8rem;
+  }
+}
+
+.color1 {
+  color: white;
+  background-color: #1f2937;
+}
 
 .table {
   --bs-table-bg: transparent;
@@ -18270,6 +18293,10 @@ table.table td a.delete {
 
 table.table td a.add {
   color: #27C46B;
+}
+
+table.table td a.detail {
+  color: #0d6efd;
 }
 
 .table td,

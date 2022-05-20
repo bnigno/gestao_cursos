@@ -46,7 +46,9 @@
                             <br>
                             <div class="btn-group" role="group">
                                 <input type="submit" class="btn btn-primary" value="Salvar">
-                                <a href="{% url 'listar-turmas' %}" class="btn btn-gray-100">Cancelar</a>
+                                <a href="{% url 'listar-turmas' %}" class="btn btn-gray-300">Cancelar</a>
+                                <a href="{% url 'gerenciar-frequencia' pk=object.id %}"
+                                   class="btn btn-secondary a-modal">Frequência</a>
                                 <a href="{% url 'deletar-turma' pk=object.id %}" class="btn btn-danger">Deletar</a>
                             </div>
                         </form>
@@ -76,6 +78,7 @@
 
         $("#id_dt_inicio").val("{{ object.dt_inicio|date:"Y-m-d" }}")
         $("#id_dt_fim").val("{{ object.dt_fim|date:"Y-m-d" }}")
+
         $(document).on('select2:open', () => {
             let allFound = document.querySelectorAll('.select2-container--open .select2-search__field');
             $(this).one('mouseup keyup', () => {
@@ -84,5 +87,6 @@
                 }, 0);
             });
         });
+
     </script>
 {% endblock javascripts %}

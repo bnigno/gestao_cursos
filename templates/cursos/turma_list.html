@@ -77,11 +77,21 @@
                                     <td class="border-0">{{ turma.valor_lanche }}</td>
                                     <td class="border-0">{{ turma.valor_transporte }}</td>
                                     <td class="border-0">
+                                        <a href="{% url 'visualizar-frequencia' pk=turma.id %}" class="detail"
+                                           tabindex="0" data-bs-toggle="popover" data-bs-placement="top"
+                                           data-bs-trigger="hover focus" data-bs-content="Visualizar Frequência"
+                                           style="color: #0d6efd;"><i class="fa-solid fa-calendar"></i></a>
+                                        <a href="{% url 'gerenciar-frequencia' pk=turma.id %}" class="add"
+                                           tabindex="0" data-bs-toggle="popover" data-bs-placement="top"
+                                           data-bs-trigger="hover focus" data-bs-content="Editar Frequência"><i
+                                                class="fa-solid fa-calendar-check"></i></a>
                                         <a href="{% url 'gerenciar-turma' pk=turma.id %}" class="edit"
-                                           title="Editar" data-toggle="tooltip"><i
+                                           tabindex="0" data-bs-toggle="popover" data-bs-placement="top"
+                                           data-bs-trigger="hover focus" data-bs-content="Editar"><i
                                                 class="icon icon-sm fa-solid fa-pencil"></i></a>
                                         <a href="{% url 'deletar-turma' pk=turma.id %}" class="delete"
-                                           title="Deletar" data-toggle="tooltip"><i
+                                           tabindex="0" data-bs-toggle="popover" data-bs-placement="top"
+                                           data-bs-trigger="hover focus" data-bs-content="Deletar"><i
                                                 class="icon icon-sm fa-solid fa-trash"></i></a>
                                     </td>
                                 </tr>
