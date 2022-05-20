@@ -436,3 +436,39 @@ class PresencaView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
         kwargs["linhas"] = linhas
         kwargs["total_geral"] = total_geral
         return super().get_context_data(**kwargs)
+
+
+class PresencaAlunoView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
+    model = Turma
+    queryset = Turma.objects.select_related("curso").prefetch_related(
+        Prefetch('alunos', queryset=Aluno.objects.select_related("dados_pagamento").order_by('nome')),
+        Prefetch('frequencia_set', queryset=Frequencia.objects.filter(has_aula=True).order_by('data'))).all()
+    template_name = "cursos/turma_frequencia_aluno.html"
+
+    def get_context_data(self, **kwargs):
+        obj = self.get_object()
+        linhas = []
+        datas = []
+        frequencias = obj.frequencia_set.all()
+        dt_inicio = self.request.GET.get("dt_inicio")
+        dt_fim = self.request.GET.get("dt_fim")
+
+        if dt_inicio:
+            frequencias = frequencias.filter(data__gte=dt_inicio)
+        if dt_fim:
+            frequencias = frequencias.filter(data__lte=dt_fim)
+
+        for f in frequencias:
+            datas.append(f.data)
+        headers = ["Nome", "Frequência", "Valor Diário", "Valor Total", "Dados de Pagamento"]
+
+        for aluno in obj.alunos.all():
+            frequencia_total = FrequenciaAluno.objects.filter(frequencia__turma=obj, aluno=aluno,
+                                                              frequencia__data__in=datas, presente=True).count()
+
+            linha = [aluno.nome, frequencia_total, obj.valor_transporte, frequencia_total * obj.valor_transporte, aluno.dados_pagamento]
+            linhas.append(linha)
+
+        kwargs["headers"] = headers
+        kwargs["linhas"] = linhas
+        return super().get_context_data(**kwargs)

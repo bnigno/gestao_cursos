@@ -13,7 +13,7 @@ class TiposPagamentos(models.Model):
     nome = models.CharField(max_length=100, verbose_name="Nome")
 
     def __str__(self):
-        return self.nome.capitalize()
+        return self.nome
 
 
 class DadosPagamentos(models.Model):
@@ -27,6 +27,16 @@ class DadosPagamentos(models.Model):
     agencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Agência bancária")
     conta = models.CharField(max_length=100, blank=True, null=True, verbose_name="Número da conta bancária")
     tipo_conta = models.IntegerField(choices=tipos_conta, blank=True, null=True, verbose_name="Tipo de conta bancária")
+
+    def __str__(self):
+        if self.tipo_pagamento.nome.lower() == "pix":
+            dados = self.chave_pix
+        elif self.tipo_pagamento.nome.lower() == "depósito em conta":
+            dados = f"{self.banco} - Ag: {self.agencia} - Conta: {self.conta} - {self.tipo_pagamento}"
+        else:
+            dados = self.tipo_pagamento.nome
+
+        return f"{self.tipo_pagamento}: {dados}"
 
 
 class Curso(models.Model):

@@ -40,8 +40,8 @@
             </div>
             <div>
                 <a class="btn btn-lg btn-secondary" style="margin: 10px"
-                   href="{% url 'visualizar-frequencia-alunos' pk=object.id %}">
-                    <i class="icon icon-sm fa-solid fa-users"></i> Listar pagamento por aluno
+                   href="{% url 'visualizar-frequencia' pk=object.id %}">
+                    <i class="icon icon-sm fa-solid fa-calendar"></i> Visualizar frequência
                 </a>
                 <a class="btn btn-lg btn-secondary" style="margin: 10px"
                    href="{% url 'gerenciar-frequencia' pk=object.id %}">
@@ -91,17 +91,12 @@
                     </div>
 
                     <div class="row mb-4">
-                        {#                        <input type='date' min='2022-05-01' max='2022-05-19'>#}
                         <table id="turma-list" class="table table-sm table-striped table-bordered nowrap"
                                style="width:100%">
                             <thead class="thead-dark">
                             <tr class="align-content-center" style="background-color: #1f2937">
                                 {% for header in headers %}
-                                    {% if header|isdate %}
-                                        <th style="align-content: center">{{ header|date:"d/m" }}</th>
-                                    {% else %}
-                                        <th style="align-content: center; background-color: #1f2937">{{ header }}</th>
-                                    {% endif %}
+                                    <th style="align-content: center; background-color: #1f2937">{{ header }}</th>
                                 {% endfor %}
                             </tr>
                             </thead>
@@ -109,32 +104,18 @@
                             {% for linha in linhas %}
                                 <tr class="align-content-center">
                                     {% for celula in linha %}
-                                        {% if celula|isbool and celula == True %}
-                                            <td style="color: green; align-content: center">Sim</td>
-                                        {% elif celula|isbool and celula == False %}
-                                            <td style="color: red; align-content: center">Não</td>
-                                        {% else %}
-                                            <td style="align-content: center">{{ celula }}</td>
-                                        {% endif %}
+                                        <td style="align-content: center">{{ celula|default_if_none:"-" }}</td>
                                     {% endfor %}
                                 </tr>
                             {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <p class="lead"><strong>Total do período: R$ {{ total_geral }}</strong></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="modal-pagamento" tabindex="-1" role="dialog" aria-labelledby="modal-default"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-            </div>
-        </div>
-    </div>
 
 {% endblock content %}
 
@@ -180,14 +161,11 @@
                             download: "open",
                             title: "Frequência de {{ object }}",
                             messageTop: "Período: {% if request.GET.dt_inicio %} {{ request.GET.dt_inicio }} {% else %} {{ object.dt_inicio }} {% endif %} a {% if request.GET.dt_fim %} {{ request.GET.dt_fim }} {% else %} {{ object.dt_fim }} {% endif %}",
-                            messageBottom: '\nTotal do período: R$ {{ total_geral }}'
-
                         },
                         {
                             extend: 'print',
                             title: "Frequência de {{ object }}",
                             messageTop: "Período: {% if request.GET.dt_inicio %} {{ request.GET.dt_inicio }} {% else %} {{ object.dt_inicio }} {% endif %} a {% if request.GET.dt_fim %} {{ request.GET.dt_fim }} {% else %} {{ object.dt_fim }} {% endif %}",
-                            messageBottom: '<br><p class="lead"><strong>Total do período: R$ {{ total_geral }}</strong></p>'
                         },
                     ],
 
