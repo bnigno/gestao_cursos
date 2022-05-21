@@ -5,40 +5,90 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, F, Count, Q
 from django.forms import modelformset_factory
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
-from django.template import loader
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
+from django.views.generic import (
+    CreateView,
+    UpdateView,
+    DeleteView,
+    ListView,
+    DetailView,
+)
 from django.views.generic.edit import FormView
 from workadays import workdays as wd
 
 from cursos.forms import TurmaForm, FrequenciaForm, PresencaForm, DatasFrequenciaForm
-from cursos.models import Professor, DadosPagamentos, Aluno, Curso, Turma, Frequencia, FrequenciaAluno
+from cursos.models import (
+    Professor,
+    DadosPagamentos,
+    Aluno,
+    Curso,
+    Turma,
+    Frequencia,
+    FrequenciaAluno,
+)
 
 
-@login_required(login_url="/login/")
-def index(request):
-    context = {'segment': 'index'}
+class HomeView(LoginRequiredMixin, ListView):
+    model = Turma
+    queryset = Turma.objects.select_related("curso").all()
+    template_name = "cursos/dashboard.html"
 
-    html_template = loader.get_template('cursos/dashboard.html')
-    return HttpResponse(html_template.render(context, request))
+    def get_context_data(self, **kwargs):
+        series_lanche = []
+        series_transporte = []
+        labels = []
+        hoje = datetime.date.today()
+        custo_por_mes = (
+            Turma.objects.filter(
+                dt_inicio__lte=hoje,
+                frequencia__has_aula=True,
+                frequencia__data__lte=hoje,
+            )
+            .values("frequencia__data__year", "frequencia__data__month")
+            .annotate(
+                dias_uteis=Count("frequencia"),
+                presencas=Count(
+                    "frequencia__alunos__presente",
+                    filter=Q(frequencia__alunos__presente=True),
+                ),
+            )
+            .annotate(
+                custo_lanche=F("valor_lanche") * F("dias_uteis"),
+                custo_transporte=F("valor_transporte") * F("presencas"),
+            )
+            .order_by("frequencia__data__year", "frequencia__data__month")
+        )
+
+        for data in custo_por_mes:
+            labels.append(
+                datetime.date(
+                    data["frequencia__data__year"], data["frequencia__data__month"], 1
+                ).strftime("%b/%y")
+            )
+            series_lanche.append(data["custo_lanche"])
+            series_transporte.append(data["custo_transporte"])
+
+        kwargs["series"] = [series_lanche, series_transporte]
+        kwargs["labels"] = labels
+
+        kwargs["turmas"] = (
+            Turma.objects.select_related("curso", "professor", "municipio")
+            .filter(dt_inicio__lte=hoje, dt_fim__gte=hoje)
+            .all()
+        )
+
+        kwargs["total_alunos"] = Aluno.objects.count()
+        kwargs["total_turmas"] = Turma.objects.count()
+
+        return super().get_context_data(**kwargs)
 
 
-# def gerenciar_professores(request):
-#     if request.method == "POST":
-#         form = ProfessorForm(request.POST)
-#         if form.is_valid():
-#             post = form.save(commit=False)
-#             post.author = request.user
-#             post.published_date = timezone.now()
-#             post.save()
-#             return redirect('post_detail', pk=post.pk)
-#     else:
-#         form = PostForm()
-#     return render(request, 'blog/post_edit.html', {'form': form})
+def gerenciar_professores(request):
+    return render(request, "cursos/index.html")
 
 
 class ProfessorListView(LoginRequiredMixin, ListView):
@@ -59,30 +109,32 @@ class ProfessorUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     fields = ["nome", "cpf"]
     success_message = "Professor %(nome)s alterado com sucesso."
     template_name = "cursos/professor_form_update.html"
-    success_url = reverse_lazy('listar-professores')
+    success_url = reverse_lazy("listar-professores")
 
 
 class ProfessorDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Professor
     success_message = "Professor removido com sucesso."
     template_name = "cursos/professor_form_delete.html"
-    success_url = reverse_lazy('listar-professores')
+    success_url = reverse_lazy("listar-professores")
 
 
 class DadosPagamentoCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = DadosPagamentos
-    fields = ['tipo_pagamento', 'chave_pix', 'banco', 'agencia', 'conta', 'tipo_conta']
+    fields = ["tipo_pagamento", "chave_pix", "banco", "agencia", "conta", "tipo_conta"]
     template_name = "cursos/dados_pagamento_form.html"
     success_url = reverse_lazy("listar-professores")
     success_message = "Dado de pagamento criado com sucesso."
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        professor_id = self.request.GET.get('professor')
-        aluno_id = self.request.GET.get('aluno')
+        professor_id = self.request.GET.get("professor")
+        aluno_id = self.request.GET.get("aluno")
 
-        context['professor'] = Professor.objects.get(pk=professor_id) if professor_id else None
-        context['aluno'] = Aluno.objects.get(pk=aluno_id) if aluno_id else None
+        context["professor"] = (
+            Professor.objects.get(pk=professor_id) if professor_id else None
+        )
+        context["aluno"] = Aluno.objects.get(pk=aluno_id) if aluno_id else None
         return context
 
     def form_valid(self, form):
@@ -113,18 +165,20 @@ class DadosPagamentoCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateVi
 
 class DadosPagamentoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = DadosPagamentos
-    fields = ['tipo_pagamento', 'chave_pix', 'banco', 'agencia', 'conta', 'tipo_conta']
+    fields = ["tipo_pagamento", "chave_pix", "banco", "agencia", "conta", "tipo_conta"]
     template_name = "cursos/dados_pagamento_form.html"
     success_url = reverse_lazy("listar-professores")
     success_message = "Dado de pagamento atualizado com sucesso."
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        professor_id = self.request.GET.get('professor')
-        aluno_id = self.request.GET.get('aluno')
+        professor_id = self.request.GET.get("professor")
+        aluno_id = self.request.GET.get("aluno")
 
-        context['professor'] = Professor.objects.get(pk=professor_id) if professor_id else None
-        context['aluno'] = Aluno.objects.get(pk=aluno_id) if aluno_id else None
+        context["professor"] = (
+            Professor.objects.get(pk=professor_id) if professor_id else None
+        )
+        context["aluno"] = Aluno.objects.get(pk=aluno_id) if aluno_id else None
         return context
 
     def form_valid(self, form):
@@ -170,14 +224,14 @@ class AlunoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     fields = ["nome", "cpf"]
     success_message = "Aluno %(nome)s alterado com sucesso."
     template_name = "cursos/aluno_form_update.html"
-    success_url = reverse_lazy('listar-alunos')
+    success_url = reverse_lazy("listar-alunos")
 
 
 class AlunoDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Aluno
     success_message = "Aluno removido com sucesso."
     template_name = "cursos/aluno_form_delete.html"
-    success_url = reverse_lazy('listar-alunos')
+    success_url = reverse_lazy("listar-alunos")
 
 
 class CursoListView(LoginRequiredMixin, ListView):
@@ -197,14 +251,14 @@ class CursoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     fields = ["nome", "carga_horaria"]
     success_message = "Curso %(nome)s alterado com sucesso."
     template_name = "cursos/curso_form_update.html"
-    success_url = reverse_lazy('listar-cursos')
+    success_url = reverse_lazy("listar-cursos")
 
 
 class CursoDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Curso
     success_message = "Curso removido com sucesso."
     template_name = "cursos/curso_form_delete.html"
-    success_url = reverse_lazy('listar-cursos')
+    success_url = reverse_lazy("listar-cursos")
 
 
 class TurmaListView(LoginRequiredMixin, ListView):
@@ -233,7 +287,9 @@ class TurmaCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
                 frequencia = Frequencia()
                 frequencia.turma = self.object
                 frequencia.data = start_date
-                frequencia.has_aula = wd.is_workday(start_date, country='BR', state="PA")
+                frequencia.has_aula = wd.is_workday(
+                    start_date, country="BR", state="PA"
+                )
                 frequencia.save()
                 for aluno in self.object.alunos.all():
                     FrequenciaAluno.objects.create(frequencia=frequencia, aluno=aluno)
@@ -264,31 +320,44 @@ class TurmaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
             Frequencia.objects.filter(turma=self.object, data__gt=end_date).delete()
 
             while start_date <= end_date:
-                if not Frequencia.objects.filter(turma=self.object, data=start_date).exists():
+                if not Frequencia.objects.filter(
+                    turma=self.object, data=start_date
+                ).exists():
                     frequencia = Frequencia()
                     frequencia.turma = self.object
                     frequencia.data = start_date
-                    frequencia.has_aula = wd.is_workday(start_date, country='BR', state="PA")
+                    frequencia.has_aula = wd.is_workday(
+                        start_date, country="BR", state="PA"
+                    )
                     frequencia.save()
                 start_date += delta
 
             for frequencia in self.object.frequencia_set.all():
                 if frequencia.has_aula:
                     for aluno in self.object.alunos.all():
-                        presenca = FrequenciaAluno.objects.filter(frequencia=frequencia, aluno=aluno).first()
+                        presenca = FrequenciaAluno.objects.filter(
+                            frequencia=frequencia, aluno=aluno
+                        ).first()
                         if not presenca:
-                            FrequenciaAluno.objects.create(frequencia=frequencia, aluno=aluno)
+                            FrequenciaAluno.objects.create(
+                                frequencia=frequencia, aluno=aluno
+                            )
                 else:
                     for aluno in self.object.alunos.all():
-                        presenca = FrequenciaAluno.objects.filter(frequencia=frequencia, aluno=aluno).first()
+                        presenca = FrequenciaAluno.objects.filter(
+                            frequencia=frequencia, aluno=aluno
+                        ).first()
                         if not presenca:
-                            FrequenciaAluno.objects.create(frequencia=frequencia, aluno=aluno)
+                            FrequenciaAluno.objects.create(
+                                frequencia=frequencia, aluno=aluno
+                            )
                         elif presenca.presente:
                             presenca.presente = False
                             presenca.save()
 
             FrequenciaAluno.objects.filter(frequencia__turma=self.object).exclude(
-                aluno__in=self.object.alunos.all()).delete()
+                aluno__in=self.object.alunos.all()
+            ).delete()
 
         if success_message:
             messages.success(self.request, success_message)
@@ -299,7 +368,7 @@ class TurmaDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Turma
     success_message = "Turma removida com sucesso."
     template_name = "cursos/turma_form_delete.html"
-    success_url = reverse_lazy('listar-turmas')
+    success_url = reverse_lazy("listar-turmas")
 
 
 class FrequenciaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -308,32 +377,47 @@ class FrequenciaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     template_name = "cursos/frequencia_form.html"
     success_url = reverse_lazy("gerenciar-frequencia")
     success_message = "Frequência salva com sucesso."
-    queryset = Turma.objects.select_related("curso").prefetch_related("frequencia_set__alunos").all()
+    queryset = (
+        Turma.objects.select_related("curso")
+        .prefetch_related("frequencia_set__alunos")
+        .all()
+    )
 
     def get_context_data(self, **kwargs):
         data_selecionada = self.request.GET.get("data_list")
 
         try:
-            data_selecionada = datetime.datetime.strptime(data_selecionada, "%Y-%m-%d").date()
+            data_selecionada = datetime.datetime.strptime(
+                data_selecionada, "%Y-%m-%d"
+            ).date()
         except:
             data_selecionada = None
 
         form_datas = DatasFrequenciaForm(
             [
                 (data, data)
-                for data in self.object.frequencia_set.order_by("data").values_list("data", flat=True)
+                for data in self.object.frequencia_set.order_by("data").values_list(
+                    "data", flat=True
+                )
             ]
         )
 
         if data_selecionada:
             kwargs["data_selecionada"] = data_selecionada
             form_datas.fields["data_list"].initial = [data_selecionada]
-            frequencia = Frequencia.objects.get(turma=self.object, data=data_selecionada)
+            frequencia = Frequencia.objects.get(
+                turma=self.object, data=data_selecionada
+            )
             kwargs["form_presenca"] = FrequenciaForm(instance=frequencia)
 
-            PresencaFormset = modelformset_factory(FrequenciaAluno, form=PresencaForm, extra=0)
+            PresencaFormset = modelformset_factory(
+                FrequenciaAluno, form=PresencaForm, extra=0
+            )
             formset = PresencaFormset(
-                queryset=FrequenciaAluno.objects.filter(frequencia=frequencia).order_by("aluno__nome").all())
+                queryset=FrequenciaAluno.objects.filter(frequencia=frequencia)
+                .order_by("aluno__nome")
+                .all()
+            )
             kwargs["alunos_formset"] = formset
             kwargs["frequencia_id"] = frequencia.id
 
@@ -347,11 +431,13 @@ class FrequenciaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         post_data = self.request.POST
-        frequencia = Frequencia.objects.get(turma=post_data["turma"], data=post_data["data"])
+        frequencia = Frequencia.objects.get(
+            turma=post_data["turma"], data=post_data["data"]
+        )
         frequencia.has_aula = True if "has_aula" in post_data.keys() else False
         frequencia.save()
 
-        url = reverse_lazy('gerenciar-frequencia', kwargs={'pk': post_data['turma']})
+        url = reverse_lazy("gerenciar-frequencia", kwargs={"pk": post_data["turma"]})
         success_url = f"{url}?data_list={post_data['data']}"
         messages.success(self.request, self.success_message)
         return HttpResponseRedirect(success_url)
@@ -382,24 +468,36 @@ class FrequenciaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
 
 class PresencaUpdateLoteView(LoginRequiredMixin, SuccessMessageMixin, FormView):
-
     def post(self, request, *args, **kwargs):
-        PresencaFormset = modelformset_factory(FrequenciaAluno, form=PresencaForm, extra=0)
+        PresencaFormset = modelformset_factory(
+            FrequenciaAluno, form=PresencaForm, extra=0
+        )
         formset = PresencaFormset(request.POST)
         instances = formset.save()
         frequencia = Frequencia.objects.get(pk=request.POST.get("frequencia_id"))
 
-        url = reverse_lazy('gerenciar-frequencia', kwargs={'pk': frequencia.turma_id})
-        messages.success(request, f"Presenças do dia {frequencia.data.strftime('%d/%m/%Y')} salvas com sucesso")
+        url = reverse_lazy("gerenciar-frequencia", kwargs={"pk": frequencia.turma_id})
+        messages.success(
+            request,
+            f"Presenças do dia {frequencia.data.strftime('%d/%m/%Y')} salvas com sucesso",
+        )
         success_url = f"{url}?data_list={frequencia.data.strftime('%Y-%m-%d')}"
         return HttpResponseRedirect(success_url)
 
 
 class PresencaView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
     model = Turma
-    queryset = Turma.objects.select_related("curso").prefetch_related(
-        Prefetch('alunos', queryset=Aluno.objects.order_by('nome')),
-        Prefetch('frequencia_set', queryset=Frequencia.objects.filter(has_aula=True).order_by('data'))).all()
+    queryset = (
+        Turma.objects.select_related("curso")
+        .prefetch_related(
+            Prefetch("alunos", queryset=Aluno.objects.order_by("nome")),
+            Prefetch(
+                "frequencia_set",
+                queryset=Frequencia.objects.filter(has_aula=True).order_by("data"),
+            ),
+        )
+        .all()
+    )
     template_name = "cursos/turma_frequencia.html"
 
     def get_context_data(self, **kwargs):
@@ -424,11 +522,16 @@ class PresencaView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
         for aluno in obj.alunos.all():
             linha = [aluno.nome]
             frequencia_total = 0
-            for presenca in FrequenciaAluno.objects.filter(frequencia__turma=obj, aluno=aluno,
-                                                           frequencia__data__in=datas).order_by("frequencia__data"):
+            for presenca in FrequenciaAluno.objects.filter(
+                frequencia__turma=obj, aluno=aluno, frequencia__data__in=datas
+            ).order_by("frequencia__data"):
                 frequencia_total += 1 if presenca.presente else 0
                 linha.append(presenca.presente)
-            linha += [frequencia_total, obj.valor_transporte, frequencia_total * obj.valor_transporte]
+            linha += [
+                frequencia_total,
+                obj.valor_transporte,
+                frequencia_total * obj.valor_transporte,
+            ]
             linhas.append(linha)
             total_geral += frequencia_total * obj.valor_transporte
 
@@ -440,9 +543,22 @@ class PresencaView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
 
 class PresencaAlunoView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
     model = Turma
-    queryset = Turma.objects.select_related("curso").prefetch_related(
-        Prefetch('alunos', queryset=Aluno.objects.select_related("dados_pagamento").order_by('nome')),
-        Prefetch('frequencia_set', queryset=Frequencia.objects.filter(has_aula=True).order_by('data'))).all()
+    queryset = (
+        Turma.objects.select_related("curso")
+        .prefetch_related(
+            Prefetch(
+                "alunos",
+                queryset=Aluno.objects.select_related("dados_pagamento").order_by(
+                    "nome"
+                ),
+            ),
+            Prefetch(
+                "frequencia_set",
+                queryset=Frequencia.objects.filter(has_aula=True).order_by("data"),
+            ),
+        )
+        .all()
+    )
     template_name = "cursos/turma_frequencia_aluno.html"
 
     def get_context_data(self, **kwargs):
@@ -460,13 +576,29 @@ class PresencaAlunoView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
 
         for f in frequencias:
             datas.append(f.data)
-        headers = ["Nome", "Frequência", "Valor Diário", "Valor Total", "Dados de Pagamento"]
+        headers = [
+            "Nome",
+            "Frequência",
+            "Valor Diário",
+            "Valor Total",
+            "Dados de Pagamento",
+        ]
 
         for aluno in obj.alunos.all():
-            frequencia_total = FrequenciaAluno.objects.filter(frequencia__turma=obj, aluno=aluno,
-                                                              frequencia__data__in=datas, presente=True).count()
+            frequencia_total = FrequenciaAluno.objects.filter(
+                frequencia__turma=obj,
+                aluno=aluno,
+                frequencia__data__in=datas,
+                presente=True,
+            ).count()
 
-            linha = [aluno.nome, frequencia_total, obj.valor_transporte, frequencia_total * obj.valor_transporte, aluno.dados_pagamento]
+            linha = [
+                aluno.nome,
+                frequencia_total,
+                obj.valor_transporte,
+                frequencia_total * obj.valor_transporte,
+                aluno.dados_pagamento,
+            ]
             linhas.append(linha)
 
         kwargs["headers"] = headers
