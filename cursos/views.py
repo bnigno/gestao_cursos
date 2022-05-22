@@ -215,7 +215,7 @@ class AlunoListView(LoginRequiredMixin, ListView):
 class AlunoCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Aluno
     fields = ["nome", "cpf"]
-    success_url = reverse_lazy("listar-alunos")
+    success_url = reverse_lazy("cadastrar-alunos")
     success_message = "Aluno %(nome)s criado com sucesso."
 
 
