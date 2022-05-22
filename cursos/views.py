@@ -584,6 +584,8 @@ class PresencaAlunoView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
             "Dados de Pagamento",
         ]
 
+        total_geral = 0
+
         for aluno in obj.alunos.all():
             frequencia_total = FrequenciaAluno.objects.filter(
                 frequencia__turma=obj,
@@ -592,15 +594,19 @@ class PresencaAlunoView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
                 presente=True,
             ).count()
 
+            valor_aluno = frequencia_total * obj.valor_transporte
+
             linha = [
                 aluno.nome,
                 frequencia_total,
                 obj.valor_transporte,
-                frequencia_total * obj.valor_transporte,
+                valor_aluno,
                 aluno.dados_pagamento,
             ]
             linhas.append(linha)
+            total_geral += valor_aluno
 
         kwargs["headers"] = headers
         kwargs["linhas"] = linhas
+        kwargs["total_geral"] = total_geral
         return super().get_context_data(**kwargs)

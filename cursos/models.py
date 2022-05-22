@@ -47,7 +47,7 @@ class DadosPagamentos(models.Model):
         if self.tipo_pagamento.nome.lower() == "pix":
             return f"{self.tipo_pagamento}: {self.chave_pix}"
         elif self.tipo_pagamento.nome.lower() == "depósito em conta":
-            return f"{self.banco} - Ag: {self.agencia} - Conta: {self.conta} - {self.tipo_pagamento}"
+            return f"{self.banco} - Ag: {self.agencia} - Conta: {self.conta} - {self.get_tipo_conta_display()}"
         else:
             return self.tipo_pagamento.nome
 

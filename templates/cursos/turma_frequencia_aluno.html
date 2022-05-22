@@ -40,7 +40,7 @@
             </div>
             <div>
                 <a class="btn btn-lg btn-secondary" style="margin: 10px"
-                   href="{% url 'visualizar-frequencia' pk=object.id %}">
+                   href="{% url 'visualizar-frequencia' pk=object.id %}{% if request.GET %}{{ request.GET|get_query_parameters }}{% endif %}">
                     <i class="fa-solid fa-calendar-days"></i> Visualizar frequência
                 </a>
                 <a class="btn btn-lg btn-secondary" style="margin: 10px"
@@ -104,13 +104,14 @@
                             {% for linha in linhas %}
                                 <tr class="align-content-center">
                                     {% for celula in linha %}
-                                        <td style="align-content: center">{{ celula|default_if_none:"-" }}</td>
+                                        <td style="align-content: center">{% if celula|isdecimal %}R$ {{ celula }}{% else %}{{ celula|default_if_none:"-" }}{% endif %}</td>
                                     {% endfor %}
                                 </tr>
                             {% endfor %}
                             </tbody>
                         </table>
                     </div>
+                    <p class="lead"><strong>Total do período: R$ {{ total_geral }}</strong></p>
                 </div>
             </div>
         </div>
@@ -160,12 +161,14 @@
                             pageSize: 'A4',
                             download: "open",
                             title: "Frequência de {{ object }}",
-                            messageTop: "Período: {% if request.GET.dt_inicio %} {{ request.GET.dt_inicio }} {% else %} {{ object.dt_inicio }} {% endif %} a {% if request.GET.dt_fim %} {{ request.GET.dt_fim }} {% else %} {{ object.dt_fim }} {% endif %}",
+                            messageTop: "Período: {% if request.GET.dt_inicio %} {{ request.GET.dt_inicio|datevalue }} {% else %} {{ object.dt_inicio }} {% endif %} a {% if request.GET.dt_fim %} {{ request.GET.dt_fim|datevalue }} {% else %} {{ object.dt_fim }} {% endif %}",
+                            messageBottom: '\nTotal do período: R$ {{ total_geral }}'
                         },
                         {
                             extend: 'print',
                             title: "Frequência de {{ object }}",
-                            messageTop: "Período: {% if request.GET.dt_inicio %} {{ request.GET.dt_inicio }} {% else %} {{ object.dt_inicio }} {% endif %} a {% if request.GET.dt_fim %} {{ request.GET.dt_fim }} {% else %} {{ object.dt_fim }} {% endif %}",
+                            messageTop: "Período: {% if request.GET.dt_inicio %} {{ request.GET.dt_inicio|datevalue }} {% else %} {{ object.dt_inicio }} {% endif %} a {% if request.GET.dt_fim %} {{ request.GET.dt_fim|datevalue }} {% else %} {{ object.dt_fim }} {% endif %}",
+                            messageBottom: '<br><p class="lead"><strong>Total do período: R$ {{ total_geral }}</strong></p>'
                         },
                     ],
 
