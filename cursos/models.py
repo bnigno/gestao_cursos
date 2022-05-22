@@ -18,25 +18,38 @@ class TiposPagamentos(models.Model):
 
 class DadosPagamentos(models.Model):
     tipos_conta = [
-        (1, 'Conta Corrente'),
-        (2, 'Poupança'),
+        (1, "Conta Corrente"),
+        (2, "Poupança"),
     ]
-    tipo_pagamento = models.ForeignKey(TiposPagamentos, on_delete=models.CASCADE, verbose_name="Tipo de pagamento")
-    chave_pix = models.CharField(max_length=300, blank=True, null=True, verbose_name="Chave PIX")
-    banco = models.CharField(max_length=100, blank=True, null=True, verbose_name="Nome do banco")
-    agencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Agência bancária")
-    conta = models.CharField(max_length=100, blank=True, null=True, verbose_name="Número da conta bancária")
-    tipo_conta = models.IntegerField(choices=tipos_conta, blank=True, null=True, verbose_name="Tipo de conta bancária")
+    tipo_pagamento = models.ForeignKey(
+        TiposPagamentos, on_delete=models.CASCADE, verbose_name="Tipo de pagamento"
+    )
+    chave_pix = models.CharField(
+        max_length=300, blank=True, null=True, verbose_name="Chave PIX"
+    )
+    banco = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Nome do banco"
+    )
+    agencia = models.CharField(
+        max_length=50, blank=True, null=True, verbose_name="Agência bancária"
+    )
+    conta = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Número da conta bancária"
+    )
+    tipo_conta = models.IntegerField(
+        choices=tipos_conta,
+        blank=True,
+        null=True,
+        verbose_name="Tipo de conta bancária",
+    )
 
     def __str__(self):
         if self.tipo_pagamento.nome.lower() == "pix":
-            dados = self.chave_pix
+            return f"{self.tipo_pagamento}: {self.chave_pix}"
         elif self.tipo_pagamento.nome.lower() == "depósito em conta":
-            dados = f"{self.banco} - Ag: {self.agencia} - Conta: {self.conta} - {self.tipo_pagamento}"
+            return f"{self.banco} - Ag: {self.agencia} - Conta: {self.conta} - {self.tipo_pagamento}"
         else:
-            dados = self.tipo_pagamento.nome
-
-        return f"{self.tipo_pagamento}: {dados}"
+            return self.tipo_pagamento.nome
 
 
 class Curso(models.Model):
@@ -49,9 +62,16 @@ class Curso(models.Model):
 
 class Professor(models.Model):
     nome = models.CharField(max_length=200, verbose_name="Nome")
-    cpf = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name="CPF")
-    dados_pagamento = models.OneToOneField(DadosPagamentos, null=True, blank=True, on_delete=models.PROTECT,
-                                           verbose_name="Dados de pagamento")
+    cpf = models.CharField(
+        max_length=50, blank=True, null=True, unique=True, verbose_name="CPF"
+    )
+    dados_pagamento = models.OneToOneField(
+        DadosPagamentos,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        verbose_name="Dados de pagamento",
+    )
 
     def __str__(self):
         return self.nome.capitalize()
@@ -59,9 +79,16 @@ class Professor(models.Model):
 
 class Aluno(models.Model):
     nome = models.CharField(max_length=200, verbose_name="Nome")
-    cpf = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name="CPF")
-    dados_pagamento = models.ForeignKey(DadosPagamentos, null=True, blank=True, on_delete=models.PROTECT,
-                                        verbose_name="Dados de pagamento")
+    cpf = models.CharField(
+        max_length=50, blank=True, null=True, unique=True, verbose_name="CPF"
+    )
+    dados_pagamento = models.ForeignKey(
+        DadosPagamentos,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        verbose_name="Dados de pagamento",
+    )
 
     def __str__(self):
         return self.nome.capitalize()
@@ -69,12 +96,20 @@ class Aluno(models.Model):
 
 class Turma(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.PROTECT, verbose_name="Curso")
-    professor = models.ForeignKey(Professor, on_delete=models.PROTECT, verbose_name="Professor")
-    municipio = models.ForeignKey(Municipio, on_delete=models.PROTECT, verbose_name="Município")
+    professor = models.ForeignKey(
+        Professor, on_delete=models.PROTECT, verbose_name="Professor"
+    )
+    municipio = models.ForeignKey(
+        Municipio, on_delete=models.PROTECT, verbose_name="Município"
+    )
     dt_inicio = models.DateField(verbose_name="Data de inicio")
     dt_fim = models.DateField(verbose_name="Data de encerramento")
-    valor_lanche = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Valor do lanche por dia")
-    valor_transporte = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Valor do Transporte por aluno")
+    valor_lanche = models.DecimalField(
+        max_digits=6, decimal_places=2, verbose_name="Valor do lanche por dia"
+    )
+    valor_transporte = models.DecimalField(
+        max_digits=6, decimal_places=2, verbose_name="Valor do Transporte por aluno"
+    )
     alunos = models.ManyToManyField(Aluno, related_name="turmas")
 
     def __str__(self):
@@ -108,7 +143,9 @@ class Frequencia(models.Model):
 
 
 class FrequenciaAluno(models.Model):
-    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name="frequencias")
+    aluno = models.ForeignKey(
+        Aluno, on_delete=models.CASCADE, related_name="frequencias"
+    )
     frequencia = models.ForeignKey(
         Frequencia, on_delete=models.CASCADE, related_name="alunos"
     )
