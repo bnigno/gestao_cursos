@@ -47,7 +47,7 @@
                                     <div id="div_id_data_list" class="form-group">
                                         <label for="id_data_list" class=" requiredField">Selecione a data:</label>
                                         <select name="data_list" class="select form-control" required=""
-                                                id="id_data_list">
+                                                id="id_data_list" onchange="this.form.submit()">
                                             {% for x, y in datas.fields.data_list.choices %}
                                                 <option value="{{ x|date:'Y-m-d' }}"
                                                         {% if datas.fields.data_list.initial.0 == x %}
@@ -56,9 +56,9 @@
                                             {% endfor %}
                                         </select>
                                     </div>
-                                    <div class="d-grid gap-2">
-                                        <input type="submit" class="btn btn-primary" value="Definir data">
-                                    </div>
+{#                                    <div class="d-grid gap-2">#}
+{#                                        <input type="submit" class="btn btn-primary" value="Definir data">#}
+{#                                    </div>#}
                                 </form>
                             </div>
                         </div>
