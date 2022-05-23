@@ -48,6 +48,7 @@
                                         <label for="id_data_list" class=" requiredField">Selecione a data:</label>
                                         <select name="data_list" class="select form-control" required=""
                                                 id="id_data_list" onchange="this.form.submit()">
+                                            <option value="">-----</option>
                                             {% for x, y in datas.fields.data_list.choices %}
                                                 <option value="{{ x|date:'Y-m-d' }}"
                                                         {% if datas.fields.data_list.initial.0 == x %}
