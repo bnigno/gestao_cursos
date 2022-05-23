@@ -77,6 +77,10 @@
 
                         <div class="row mb-4">
                             <h4>Alunos:</h4>
+                            <div class="btn-group col-4" role="group" aria-label="Basic example">
+                              <button type="button" class="btn btn-primary" id="selecionar-todos">Marcar todos como presentes</button>
+                              <button type="button" class="btn btn-secondary" id="deselecionar-todos">Marcar todos como ausentes</button>
+                            </div>
                             <form method="POST" id="form_alunos" action="{% url 'salvar-presencas' %}"
                                   class="row gy-2 gx-3 align-items-center ">
                                 {% csrf_token %}
@@ -113,7 +117,7 @@
             if (!this.checked) {
                 let answer = window.confirm("Deseja realmente marcar como sem aula?\nTodas as presenças serão removidas.");
                 if (answer) {
-                    $("#form_alunos :input").prop("checked", false);
+                    $("").prop("checked", false);
                     $("#form_alunos :input").prop("disabled", true);
                 } else {
                     console.log(answer)
@@ -123,5 +127,13 @@
             }
         });
 
+        $("#selecionar-todos").click(function () {
+            console.log("aqiu")
+            $("#form_alunos :input").prop("checked", true);
+        });
+        $("#deselecionar-todos").click(function () {
+            console.log("aqiu")
+            $("#form_alunos :input").prop("checked", false);
+        });
     </script>
 {% endblock javascripts %}

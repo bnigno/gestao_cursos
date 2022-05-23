@@ -318,7 +318,11 @@ class CursoDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
 
 class TurmaListView(LoginRequiredMixin, ListView):
     model = Turma
-    queryset = Turma.objects.select_related("curso", "professor", "municipio").all()
+    queryset = (
+        Turma.objects.select_related("curso", "professor", "municipio")
+        .prefetch_related(Prefetch("alunos", queryset=Aluno.objects.order_by("nome")))
+        .all()
+    )
     template_name = "cursos/turma_list.html"
 
 
