@@ -20,7 +20,13 @@ from django.views.generic import (
 from django.views.generic.edit import FormView
 from workadays import workdays as wd
 
-from cursos.forms import TurmaForm, FrequenciaForm, PresencaForm, DatasFrequenciaForm
+from cursos.forms import (
+    TurmaForm,
+    FrequenciaForm,
+    PresencaForm,
+    DatasFrequenciaForm,
+    DadosPagamentosForm,
+)
 from cursos.models import (
     Professor,
     DadosPagamentos,
@@ -218,6 +224,23 @@ class AlunoCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_url = reverse_lazy("cadastrar-alunos")
     success_message = "Aluno %(nome)s criado com sucesso."
 
+    def get_context_data(self, **kwargs):
+        kwargs["dados_pagamento_form"] = DadosPagamentosForm()
+        return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        success_message = self.get_success_message(form.cleaned_data)
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            dados_pagamentos = DadosPagamentosForm(self.request.POST).save()
+            self.object.dados_pagamento = dados_pagamentos
+            self.object.save()
+
+            if success_message:
+                messages.success(self.request, success_message)
+
+        return redirect(self.success_url)
+
 
 class AlunoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Aluno
@@ -225,6 +248,38 @@ class AlunoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = "Aluno %(nome)s alterado com sucesso."
     template_name = "cursos/aluno_form_update.html"
     success_url = reverse_lazy("listar-alunos")
+
+    def get_context_data(self, **kwargs):
+
+        if not self.object.dados_pagamento:
+            kwargs["dados_pagamento_form"] = DadosPagamentosForm(
+                instance=self.object.dados_pagamento, initial=[("aluno", self.object)]
+            )
+        else:
+            kwargs["dados_pagamento_form"] = DadosPagamentosForm(
+                instance=self.object.dados_pagamento
+            )
+
+        return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        success_message = self.get_success_message(form.cleaned_data)
+        with transaction.atomic():
+            self.object = form.save()
+
+            if self.object.dados_pagamento:
+                DadosPagamentosForm(
+                    self.request.POST, instance=self.object.dados_pagamento
+                ).save()
+            else:
+                dados_pagamentos = DadosPagamentosForm(self.request.POST).save()
+                self.object.dados_pagamento = dados_pagamentos
+                self.object.save()
+
+            if success_message:
+                messages.success(self.request, success_message)
+
+        return redirect(self.success_url)
 
 
 class AlunoDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
@@ -441,30 +496,6 @@ class FrequenciaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         success_url = f"{url}?data_list={post_data['data']}"
         messages.success(self.request, self.success_message)
         return HttpResponseRedirect(success_url)
-
-
-# class TurmaViewSet(viewsets.ModelViewSet):
-#     queryset = Turma.objects.all()
-#     serializer_class = TurmaAlunoSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-#     filter_backends = (DjangoFilterBackend,)
-#
-#     def retrieve(self, request, *args, **kwargs):
-#         result = []
-#         obj = self.get_object()
-#         dict_houve_aula = {"nome": "Houve aula?"}
-#         for frequencia in Frequencia.objects.filter(turma=obj).order_by("data").all():
-#             dict_houve_aula[frequencia.data.strftime('%Y-%m-%d')] = frequencia.has_aula
-#         result.append(dict_houve_aula)
-#         for aluno in obj.alunos.order_by("nome").all():
-#             aluno_dict = {"nome": aluno.nome}
-#             for frequencia in Frequencia.objects.filter(turma=obj).order_by("data").all():
-#                 frequencia_aluno = FrequenciaAluno.objects.filter(frequencia=frequencia, aluno=aluno).first()
-#                 aluno_dict[frequencia.data.strftime('%Y-%m-%d')] = frequencia_aluno.presente if frequencia_aluno else False
-#             result.append(aluno_dict)
-#         return Response(
-#             result, status=status.HTTP_200_OK
-#         )
 
 
 class PresencaUpdateLoteView(LoginRequiredMixin, SuccessMessageMixin, FormView):

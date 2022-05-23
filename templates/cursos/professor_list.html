@@ -66,17 +66,7 @@
                                     <td class="border-0">{{ professor.nome }}</td>
                                     <td class="border-0">{{ professor.cpf|default_if_none:"" }}</td>
                                     {% if professor.dados_pagamento %}
-                                        {% if professor.dados_pagamento.tipo_pagamento.nome|lower == "pix" %}
-                                            <td class="border-0">{{ professor.dados_pagamento.tipo_pagamento }}: {{ professor.dados_pagamento.chave_pix|default_if_none:"Sem chave" }}</td>
-                                        {% elif professor.dados_pagamento.tipo_pagamento.nome|lower == "depósito em conta" %}
-                                            <td class="border-0">{{ professor.dados_pagamento.tipo_pagamento }}: {{ professor.dados_pagamento.banco|default_if_none:"" }}
-                                                - Agência: {{ professor.dados_pagamento.conta|default_if_none:"" }} -
-                                                Conta: {{ professor.dados_pagamento.conta|default_if_none:"" }} - Tipo
-                                                de
-                                                Conta: {{ professor.dados_pagamento.tipo_conta|default_if_none:"" }}</td>
-                                        {% elif professor.dados_pagamento.tipo_pagamento.nome|lower == "espécie" %}
-                                            <td class="border-0">{{ professor.dados_pagamento.tipo_pagamento }}</td>
-                                        {% endif %}
+                                        <td class="border-0">{{ professor.dados_pagamento }}</td>
                                     {% else %}
                                         <td class="border-0"></td>
                                     {% endif %}
