@@ -96,3 +96,7 @@ class DatasFrequenciaForm(forms.Form):
     def __init__(self, choices, *args, **kwargs):
         super(DatasFrequenciaForm, self).__init__(*args, **kwargs)
         self.fields["data_list"].choices = choices
+
+
+class SendPlanilhaForm(forms.Form):
+    arquivo = forms.FileField(widget=forms.FileInput(attrs={"accept": ".xlsx"}))

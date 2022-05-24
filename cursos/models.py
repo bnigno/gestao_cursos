@@ -74,7 +74,7 @@ class Professor(models.Model):
     )
 
     def __str__(self):
-        return self.nome.capitalize()
+        return self.nome.title()
 
 
 class Aluno(models.Model):
@@ -91,7 +91,7 @@ class Aluno(models.Model):
     )
 
     def __str__(self):
-        return self.nome.capitalize()
+        return self.nome.title()
 
 
 class Turma(models.Model):

@@ -1,5 +1,7 @@
 import datetime
+import re
 
+import pylightxl as xl
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,9 +9,10 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
 from django.db.models import Prefetch, F, Count, Q
 from django.forms import modelformset_factory
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
+from django.views import View
 from django.views.generic import (
     CreateView,
     UpdateView,
@@ -26,6 +29,7 @@ from cursos.forms import (
     PresencaForm,
     DatasFrequenciaForm,
     DadosPagamentosForm,
+    SendPlanilhaForm,
 )
 from cursos.models import (
     Professor,
@@ -645,3 +649,59 @@ class PresencaAlunoView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
         kwargs["linhas"] = linhas
         kwargs["total_geral"] = total_geral
         return super().get_context_data(**kwargs)
+
+
+class GetTemplateAlunos(View):
+    def get(self, request):
+        path = "static/template/template_cadastro_alunos.xlsx"
+
+        file = open(path, "rb")
+
+        response = HttpResponse(
+            file.read(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response[
+            "Content-Disposition"
+        ] = "attachment; filename=template_cadastro_alunos.xlsx"
+        return response
+
+
+class PlanilhaAlunosView(LoginRequiredMixin, SuccessMessageMixin, FormView):
+    template_name = "cursos/planilha_form.html"
+    form_class = SendPlanilhaForm
+    success_url = reverse_lazy("listar-alunos")
+    success_message = "Planilha importada com sucesso"
+
+    def post(self, request, *args, **kwargs):
+        form = SendPlanilhaForm(request.POST, request.FILES)
+        if form.is_valid():
+            db = xl.readxl(form.cleaned_data["arquivo"])
+            for row in db.ws(ws=db.ws_names[0]).rows:
+                with transaction.atomic():
+                    if row[0] and row[0] != "Nome":
+                        aluno = Aluno()
+                        aluno.nome = row[0]
+                        aluno.cpf = row[1] if row[1] else None
+                        dados_pagamento = None
+                        if row[2]:
+                            dados_pagamento = DadosPagamentos()
+                            dados_pagamento.tipo_pagamento_id = 1
+                            dados_pagamento.chave_pix = row[2]
+                        elif row[3] and row[4] and row[5] and row[6]:
+                            dados_pagamento = DadosPagamentos()
+                            dados_pagamento.tipo_pagamento_id = 2
+                            dados_pagamento.banco = row[3]
+                            dados_pagamento.agencia = row[4]
+                            dados_pagamento.conta = row[5]
+                            dados_pagamento.tipo_conta = (
+                                1 if re.search(r"corrente", row[6], re.I) else 2
+                            )
+
+                        if dados_pagamento:
+                            dados_pagamento.save()
+                            aluno.dados_pagamento = dados_pagamento
+                        aluno.save()
+
+        messages.success(self.request, self.success_message)
+        return HttpResponseRedirect(self.success_url)

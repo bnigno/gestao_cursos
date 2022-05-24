@@ -37,10 +37,20 @@
                 <p class="mb-0">Lista de alunos cadastrados</p>
             </div>
             <div>
-                <a class="btn btn-lg btn-outline-primary" style="margin: 10px"
+                <div class="dropdown">
+                  <button class="btn btn-lg btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    Planilha <i class="fa-solid fa-caret-down"></i>
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="{% url 'get-template-alunos' %}">Download do modelo</a></li>
+                    <li><a class="dropdown-item a-modal" href="{% url 'planilha-alunos' %}">Enviar planilha</a></li>
+                  </ul>
+                    <a class="btn btn-lg btn-outline-primary" style="margin: 10px"
                    href="{% url 'cadastrar-alunos' %}">
                     <i class="fa-solid fa-plus"></i> Adicionar
                 </a>
+                </div>
+
             </div>
         </div>
     </div>

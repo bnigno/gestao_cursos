@@ -35,3 +35,4 @@ tzdata==2022.1
 urllib3==1.26.9
 wcwidth==0.2.5
 workadays==2021.12.18
+pylightxl~=1.59

@@ -31,6 +31,14 @@ urlpatterns = [
     path("alunos/<pk>/", views.AlunoUpdateView.as_view(), name="gerenciar-aluno"),
     path("alunos/<pk>/deletar/", views.AlunoDeleteView.as_view(), name="deletar-aluno"),
     path(
+        "templates/alunos/",
+        views.GetTemplateAlunos.as_view(),
+        name="get-template-alunos",
+    ),
+    path(
+        "planilhas/alunos/", views.PlanilhaAlunosView.as_view(), name="planilha-alunos"
+    ),
+    path(
         "dados-pagamento/cadastrar/",
         views.DadosPagamentoCreateView.as_view(),
         name="cadastrar-dados-pagamentos",
