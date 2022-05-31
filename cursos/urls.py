@@ -72,4 +72,9 @@ urlpatterns = [
         name="gerenciar-frequencia",
     ),
     path("presencas/", views.PresencaUpdateLoteView.as_view(), name="salvar-presencas"),
+    path(
+        "relatorios/previsao-gastos/",
+        views.RelatorioPrevisaoView.as_view(),
+        name="relatorio-previsao",
+    ),
 ]

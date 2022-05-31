@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
-from django.db.models import Prefetch, F, Count, Q
+from django.db.models import Prefetch, F, Count, Q, Value
+from django.db.models.functions import Concat
 from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect, render
@@ -48,43 +49,54 @@ class HomeView(LoginRequiredMixin, ListView):
     template_name = "cursos/dashboard.html"
 
     def get_context_data(self, **kwargs):
-        series_lanche = []
-        series_transporte = []
-        labels = []
+        # series_lanche = []
+        # series_transporte = []
+        # labels = []
         hoje = datetime.date.today()
-        custo_por_mes = (
-            Turma.objects.filter(
-                dt_inicio__lte=hoje,
-                frequencia__has_aula=True,
-                frequencia__data__lte=hoje,
-            )
-            .values("frequencia__data__year", "frequencia__data__month")
-            .annotate(
-                dias_uteis=Count("frequencia"),
-                presencas=Count(
-                    "frequencia__alunos__presente",
-                    filter=Q(frequencia__alunos__presente=True),
-                ),
-            )
-            .annotate(
-                custo_lanche=F("valor_lanche") * F("dias_uteis"),
-                custo_transporte=F("valor_transporte") * F("presencas"),
-            )
-            .order_by("frequencia__data__year", "frequencia__data__month")
-        )
-
-        for data in custo_por_mes:
-            labels.append(
-                datetime.date(
-                    data["frequencia__data__year"], data["frequencia__data__month"], 1
-                ).strftime("%b/%y")
-            )
-            series_lanche.append(data["custo_lanche"])
-            series_transporte.append(data["custo_transporte"])
-
-        kwargs["series"] = [series_lanche, series_transporte]
-        kwargs["labels"] = labels
-
+        # datas = (
+        #     Turma.objects.filter(
+        #         dt_inicio__lte=hoje,
+        #         frequencia__data__lte=hoje,
+        #     )
+        #     .annotate(
+        #         data_format=Concat(
+        #             F("frequencia__data__year"),
+        #             Value("-"),
+        #             F("frequencia__data__month"),
+        #             Value("-"),
+        #             Value(1),
+        #             output_field=DateField(),
+        #         )
+        #     )
+        #     .distinct("data_format")
+        #     .order_by("data_format")
+        #     .values("data_format")
+        # )
+        #
+        # for data in datas:
+        #     ano = data["data_format"].split("-")[0]
+        #     mes = data["data_format"].split("-")[1]
+        #     labels.append(datetime.date(ano, mes, 1))
+        #     dias_uteis = Frequencia.objects.filter(
+        #         has_aula=True,
+        #         data__month=mes,
+        #         data__year=ano,
+        #     ).count()
+        #     presencas = FrequenciaAluno.objects.filter(
+        #         frequencia__data__month=mes,
+        #         frequencia__data__year=ano,
+        #         frequencia__has_aula=True,
+        #         presente=True,
+        #     ).count()
+        #     # series_lanche.append(dias_uteis)
+        #     series_transporte.append(data["custo_transporte"])
+        #
+        # kwargs["series"] = [series_lanche, series_transporte]
+        # kwargs["labels"] = labels
+        #
+        # # kwargs["series"] = [series_lanche]
+        # # kwargs["labels"] = labels
+        #
         kwargs["turmas"] = (
             Turma.objects.select_related("curso", "professor", "municipio")
             .filter(dt_inicio__lte=hoje, dt_fim__gte=hoje)
@@ -705,3 +717,50 @@ class PlanilhaAlunosView(LoginRequiredMixin, SuccessMessageMixin, FormView):
 
         messages.success(self.request, self.success_message)
         return HttpResponseRedirect(self.success_url)
+
+
+class RelatorioPrevisaoView(LoginRequiredMixin, ListView):
+    model = Frequencia
+    # queryset = Turma.objects.select_related("curso").prefetch_related("frequencia_set__alunos").all()
+    queryset = Frequencia.objects.select_related("turma__curso").all()
+    template_name = "cursos/relatorio-previsao-gastos.html"
+
+    def get_context_data(self, **kwargs):
+        dt_inicio = self.request.GET.get("dt_inicio")
+        dt_fim = self.request.GET.get("dt_fim")
+        total = 0
+        linhas = []
+        if dt_inicio and dt_fim:
+            for turma in (
+                self.get_queryset()
+                .filter(data__gte=dt_inicio, data__lte=dt_fim)
+                .values("turma")
+                .annotate(
+                    dias_uteis=Count("id", filter=Q(has_aula=True), distinct=True),
+                    qtd_alunos=Count("turma__alunos", distinct=True),
+                    nome_turma=Concat(
+                        "turma__curso__nome", Value(" - "), "turma__municipio__nome"
+                    ),
+                )
+                .annotate(
+                    total_lanche=F("turma__valor_lanche") * F("dias_uteis"),
+                    total_transporte=F("turma__valor_transporte")
+                    * F("qtd_alunos")
+                    * F("dias_uteis"),
+                )
+            ):
+                total_linha = turma["total_lanche"] + turma["total_transporte"]
+                linhas.append(
+                    [
+                        turma["nome_turma"],
+                        turma["total_lanche"],
+                        turma["total_transporte"],
+                        total_linha,
+                    ]
+                )
+                total += total_linha
+
+            kwargs["linhas"] = linhas
+            kwargs["total"] = total
+
+            return super().get_context_data(**kwargs)

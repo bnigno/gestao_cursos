@@ -79,7 +79,6 @@
                           <span class="sidebar-text">Turmas</span>
                       </a>
                   </li>
-                  <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
                   <li class="nav-item {% if request.path|startswith:'/professores/' %} active {% endif %}">
                       <a href="{% url 'listar-professores' %}" class="nav-link">
                   <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
@@ -96,6 +95,19 @@
                           <span class="sidebar-text">Alunos</span>
                       </a>
                   </li>
+                  <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
+
+                  <li class="nav-item {% if request.path|startswith:'/relatorios/' %} active {% endif %}">
+                          <a href="{% url 'relatorio-previsao' %}" class="nav-link">
+                      <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
+                          <i class="icon icon-xs me-2 fa-solid fa-file"></i>
+                              <i class="fa-solid fa-angles-right fa-stack-1x fa-inverse fa-2xs" style="color: #FFFFFF"></i>
+                      </span>
+                              <span class="sidebar-text">Previsão de Gastos</span>
+                          </a>
+                  </li>
+
+
                   <li class="nav-item">
                       <a
                               href="{% url 'logout' %}"
