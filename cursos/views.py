@@ -11,7 +11,7 @@ from django.db.models import Prefetch, F, Count, Q, Value
 from django.db.models.functions import Concat
 from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import (
@@ -107,10 +107,6 @@ class HomeView(LoginRequiredMixin, ListView):
         kwargs["total_turmas"] = Turma.objects.count()
 
         return super().get_context_data(**kwargs)
-
-
-def gerenciar_professores(request):
-    return render(request, "cursos/index.html")
 
 
 class ProfessorListView(LoginRequiredMixin, ListView):
