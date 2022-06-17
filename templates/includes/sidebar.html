@@ -97,13 +97,22 @@
                   </li>
                   <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
 
-                  <li class="nav-item {% if request.path|startswith:'/relatorios/' %} active {% endif %}">
+                  <li class="nav-item {% if request.path|startswith:'/relatorios/previsao-gastos' %} active {% endif %}">
                           <a href="{% url 'relatorio-previsao' %}" class="nav-link">
                       <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
-                          <i class="icon icon-xs me-2 fa-solid fa-file"></i>
-                              <i class="fa-solid fa-angles-right fa-stack-1x fa-inverse fa-2xs" style="color: #FFFFFF"></i>
+                          <i class="icon icon-xs  fa-solid fa-file"></i>
+                              <i class="fa-solid fa-angles-right fa-stack-1x fa-inverse fa-2xs" style="color: #f0bc74"></i>
                       </span>
                               <span class="sidebar-text">Previsão de Gastos</span>
+                          </a>
+                  </li>
+                    <li class="nav-item {% if request.path|startswith:'/relatorios/lanche' %} active {% endif %}">
+                          <a href="{% url 'relatorio-lanche' %}" class="nav-link">
+                      <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
+                          <i class="icon icon-xs  fa-solid fa-file"></i>
+                              <i class="fa-solid fa-apple-whole fa-stack-1x fa-inverse fa-2xs" style="color: #f0bc74"></i>
+                      </span>
+                              <span class="sidebar-text">Custo de Lanche</span>
                           </a>
                   </li>
 

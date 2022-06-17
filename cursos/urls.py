@@ -77,4 +77,9 @@ urlpatterns = [
         views.RelatorioPrevisaoView.as_view(),
         name="relatorio-previsao",
     ),
+    path(
+        "relatorios/lanche/",
+        views.RelatorioLancheView.as_view(),
+        name="relatorio-lanche",
+    ),
 ]

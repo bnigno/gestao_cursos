@@ -227,7 +227,13 @@ class DadosPagamentoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateVi
 
 class AlunoListView(LoginRequiredMixin, ListView):
     model = Aluno
-    queryset = Aluno.objects.prefetch_related("turmas__curso").all()
+    queryset = (
+        Aluno.objects.select_related(
+            "dados_pagamento", "dados_pagamento__tipo_pagamento"
+        )
+        .prefetch_related("turmas__curso")
+        .all()
+    )
     template_name = "cursos/aluno_list.html"
 
 
@@ -756,6 +762,50 @@ class RelatorioPrevisaoView(LoginRequiredMixin, ListView):
                     ]
                 )
                 total += total_linha
+
+            kwargs["linhas"] = linhas
+            kwargs["total"] = total
+
+            return super().get_context_data(**kwargs)
+
+
+class RelatorioLancheView(LoginRequiredMixin, ListView):
+    model = Turma
+    queryset = Turma.objects.select_related("curso", "municipio").all()
+
+    template_name = "cursos/relatorio-lanche.html"
+
+    def get_context_data(self, **kwargs):
+        dt_inicio = self.request.GET.get("dt_inicio")
+        dt_fim = self.request.GET.get("dt_fim")
+        total = 0
+        linhas = []
+        if dt_inicio and dt_fim:
+            for turma in (
+                self.get_queryset()
+                .annotate(
+                    dias_uteis=Count(
+                        "frequencia__id",
+                        filter=Q(
+                            frequencia__has_aula=True,
+                            frequencia__data__gte=dt_inicio,
+                            frequencia__data__lte=dt_fim,
+                        ),
+                        distinct=True,
+                    ),
+                    nome_turma=Concat("curso__nome", Value(" - "), "municipio__nome"),
+                )
+                .annotate(total_lanche=F("valor_lanche") * F("dias_uteis"))
+            ).values():
+                linhas.append(
+                    [
+                        turma["nome_turma"],
+                        turma["dias_uteis"],
+                        turma["valor_lanche"],
+                        turma["valor_lanche"] * turma["dias_uteis"],
+                    ]
+                )
+                total += turma["total_lanche"]
 
             kwargs["linhas"] = linhas
             kwargs["total"] = total
