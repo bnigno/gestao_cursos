@@ -57,7 +57,7 @@ class Curso(models.Model):
     carga_horaria = models.IntegerField(verbose_name="Carga Horária (h)")
 
     def __str__(self):
-        return self.nome.capitalize()
+        return self.nome.title()
 
 
 class Professor(models.Model):
