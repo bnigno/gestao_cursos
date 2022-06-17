@@ -40,6 +40,7 @@ from cursos.models import (
     Turma,
     Frequencia,
     FrequenciaAluno,
+    Municipio,
 )
 
 
@@ -778,8 +779,16 @@ class RelatorioLancheView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         dt_inicio = self.request.GET.get("dt_inicio")
         dt_fim = self.request.GET.get("dt_fim")
+        municipio = self.request.GET.get("municipio")
         total = 0
         linhas = []
+        kwargs["municipios"] = Municipio.objects.filter(
+            id__in=Turma.objects.values_list("municipio_id", flat=True)
+        ).all()
+
+        if municipio:
+            self.queryset = self.get_queryset().filter(municipio_id=municipio)
+
         if dt_inicio and dt_fim:
             for turma in (
                 self.get_queryset()
@@ -810,4 +819,4 @@ class RelatorioLancheView(LoginRequiredMixin, ListView):
             kwargs["linhas"] = linhas
             kwargs["total"] = total
 
-            return super().get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)

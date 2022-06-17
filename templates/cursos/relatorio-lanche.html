@@ -57,18 +57,31 @@
                                         <div id="div_id_dt_inicio" class="col form-group g-2">
                                             <input id="id_dt_inicio" class="dateinput form-control" name="dt_inicio"
                                                    type="date"
-                                                   {% if request.GET.dt_inicio %} value="{{ request.GET.dt_inicio }}" {% endif %}>
+                                                   {% if request.GET.dt_inicio %} value="{{ request.GET.dt_inicio }}" {% endif %} required>
                                         </div>
                                         <div class="col-1 form-group g-2">
                                             <p class="text-center" style="padding-top: 5px;">até:</p>
                                         </div>
                                         <div id="div_id_dt_fim" class="col form-group g-2">
                                             <input id="id_dt_fim" class="dateinput form-control" name="dt_fim"
-                                                   type="date" {% if request.GET.dt_fim %} value="{{ request.GET.dt_fim }}" {% endif %}>
+                                                   type="date" {% if request.GET.dt_fim %} value="{{ request.GET.dt_fim }}" {% endif %} required>
+                                        </div>
+                                        <div id="div_id_municipio" class="col form-group g-2">
+{#                                            <label for="id_municipio" class=" requiredField">Município:</label>#}
+                                            <select name="municipio" class="select form-control" id="id_municipio">
+                                                <option value="">Selecione o município</option>
+                                                {% for municipio in municipios %}
+                                                    <option value="{{ municipio.id }}"
+                                                            {% if request.GET.municipio == municipio.id|striptags %}
+                                                            selected{% endif %}>
+                                                        {{ municipio.nome }}</option>
+                                                {% endfor %}
+                                            <script>console.log("{{ request.GET.municipio }}")</script>
+                                            </select>
                                         </div>
                                         <div id="div_submit" class="col form-group g-0">
                                             <input type="submit" class="btn btn-primary form-control"
-                                                   value="Filtrar datas">
+                                                   value="Filtrar">
                                         </div>
                                     </form>
                                 </div>
