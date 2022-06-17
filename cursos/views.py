@@ -227,6 +227,7 @@ class DadosPagamentoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateVi
 
 class AlunoListView(LoginRequiredMixin, ListView):
     model = Aluno
+    queryset = Aluno.objects.prefetch_related("turmas__curso").all()
     template_name = "cursos/aluno_list.html"
 
 

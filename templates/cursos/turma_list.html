@@ -57,11 +57,11 @@
                                 <th class="border-0 rounded-start">Curso</th>
                                 <th class="border-0">Professor</th>
                                 <th class="border-0">Município</th>
-                                <th class="border-0">Data de Início</th>
-                                <th class="border-0">Data de Fim</th>
-                                <th class="border-0">Nº de Alunos</th>
-                                <th class="border-0">Valor Lanche</th>
-                                <th class="border-0">Valor Transporte</th>
+                                <th class="border-0">Início</th>
+                                <th class="border-0">Fim</th>
+                                <th class="border-0">Alunos</th>
+                                <th class="border-0">Lanche</th>
+                                <th class="border-0">Transporte</th>
                                 <th class="border-0 rounded-end">Ações</th>
                             </tr>
                             </thead>
@@ -69,7 +69,7 @@
                             {% for turma in object_list %}
                                 <tr>
                                     <td class="border-0">{{ turma.curso }}</td>
-                                    <td class="border-0">{{ turma.professor }}</td>
+                                    <td class="border-0"><abbr title="{{ turma.professor }}">{{ turma.professor|truncatechars:12 }}</abbr></td>
                                     <td class="border-0">{{ turma.municipio }}</td>
                                     <td class="border-0">{{ turma.dt_inicio|date:'Y-m-d' }} 03:00:00</td>
                                     <td class="border-0">{{ turma.dt_fim|date:'Y-m-d' }} 03:00:00</td>
