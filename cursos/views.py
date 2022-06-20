@@ -802,19 +802,20 @@ class RelatorioLancheView(LoginRequiredMixin, ListView):
                         ),
                         distinct=True,
                     ),
-                    nome_turma=Concat("curso__nome", Value(" - "), "municipio__nome"),
                 )
-                .annotate(total_lanche=F("valor_lanche") * F("dias_uteis"))
-            ).values():
+                .values("curso__nome", "municipio__nome", "dias_uteis", "valor_lanche")
+            ):
+                total_linha = turma["valor_lanche"] * turma["dias_uteis"]
                 linhas.append(
                     [
-                        turma["nome_turma"],
+                        turma["curso__nome"],
+                        turma["municipio__nome"],
                         turma["dias_uteis"],
                         turma["valor_lanche"],
-                        turma["valor_lanche"] * turma["dias_uteis"],
+                        total_linha,
                     ]
                 )
-                total += turma["total_lanche"]
+                total += total_linha
 
             kwargs["linhas"] = linhas
             kwargs["total"] = total
