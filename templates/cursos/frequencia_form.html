@@ -68,7 +68,7 @@
                     {% if data_selecionada %}
                         <div class="row mb-4">
                             <h4>Frequência de {{ data_selecionada|date:'l, d \d\e F \d\e Y' }}</h4>
-                            <form method="POST" action="{% url 'gerenciar-frequencia' pk=object.id %}"
+                            <form method="POST" action="{% localize off %}{% url 'gerenciar-frequencia' pk=object.id %}{% endlocalize %}"
                                   class="row g-3 row-cols-lg-auto">
                                 {% csrf_token %}
                                 {{ form_presenca|crispy }}
@@ -86,7 +86,7 @@
                                   class="row gy-2 gx-3 align-items-center ">
                                 {% csrf_token %}
                                 <input type="hidden" id="frequencia_id" name="frequencia_id"
-                                       value="{{ frequencia_id }}">
+                                       value="{% localize off %}{{ frequencia_id }}{% endlocalize %}">
                                 {{ alunos_formset|crispy }}
                                 <input type="submit" class="btn btn-primary" value="Salvar">
                             </form>
