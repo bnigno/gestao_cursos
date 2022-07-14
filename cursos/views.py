@@ -374,6 +374,10 @@ class TurmaCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
                     FrequenciaAluno.objects.create(frequencia=frequencia, aluno=aluno)
                 start_date += delta
 
+            Aluno.objects.filter(
+                id__in=self.object.alunos.values_list("id", flat=True)
+            ).update(is_disponivel=False)
+
         if success_message:
             messages.success(self.request, success_message)
         return redirect(reverse("listar-turmas"))
@@ -397,6 +401,9 @@ class TurmaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
             Frequencia.objects.filter(turma=self.object, data__lt=start_date).delete()
             Frequencia.objects.filter(turma=self.object, data__gt=end_date).delete()
+            Aluno.objects.filter(
+                id__in=self.object.alunos.values_list("id", flat=True)
+            ).update(is_disponivel=False)
 
             while start_date <= end_date:
                 if not Frequencia.objects.filter(
@@ -696,9 +703,18 @@ class PlanilhaAlunosView(LoginRequiredMixin, SuccessMessageMixin, FormView):
             for row in db.ws(ws=db.ws_names[0]).rows:
                 with transaction.atomic():
                     if row[0] and row[0] != "Nome":
+                        cpf = row[1] if row[1] else None
+
+                        if cpf:
+                            aluno = Aluno.objects.filter(cpf=cpf).first()
+                            if aluno:
+                                aluno.is_disponivel = True
+                                aluno.save()
+                                continue
+
                         aluno = Aluno()
                         aluno.nome = row[0]
-                        aluno.cpf = row[1] if row[1] else None
+                        aluno.cpf = cpf
                         dados_pagamento = None
                         if row[2]:
                             dados_pagamento = DadosPagamentos()

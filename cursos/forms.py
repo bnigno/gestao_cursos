@@ -34,8 +34,6 @@ class DadosPagamentosForm(forms.ModelForm):
 
 
 class TurmaForm(forms.ModelForm):
-    # alunos = ModelMultipleChoiceField(queryset=Aluno.objects.filter(turmas__isnull=True).all())
-
     class Meta:
         model = Turma
         fields = (
@@ -55,15 +53,15 @@ class TurmaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(TurmaForm, self).__init__(*args, **kwargs)
-        if self.instance:
+        if self.instance.id:
             self.fields["alunos"].queryset = (
-                Aluno.objects.filter(Q(turmas__isnull=True) | Q(turmas=self.instance))
+                Aluno.objects.filter(Q(is_disponivel=True) | Q(turmas=self.instance))
                 .order_by("nome")
                 .all()
             )
         else:
             self.fields["alunos"].queryset = (
-                Aluno.objects.filter(turmas__isnull=True).order_by("nome").all()
+                Aluno.objects.filter(is_disponivel=True).order_by("nome").all()
             )
 
 
