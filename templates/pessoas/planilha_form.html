@@ -1,0 +1,15 @@
+{% load crispy_forms_tags %}
+<div class="modal-header">
+    <h2 class="h6 modal-title">Enviar Planilha de Pessoas</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <form class="dropzone" enctype="multipart/form-data" method="post" id="form-planilha" action="{% url 'planilha-pessoas' %}">
+        {% csrf_token %}
+        {{ form|crispy }}
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="submit" form="form-planilha" class="btn btn-primary">Enviar</button>
+    <button type="button" class="btn btn-link text-gray ms-auto" data-bs-dismiss="modal">Cancelar</button>
+</div>

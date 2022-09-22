@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "cursos.apps.CursosConfig",
+    "pessoas.apps.PessoasConfig",
     "rest_framework",
     "crispy_forms",
 ]

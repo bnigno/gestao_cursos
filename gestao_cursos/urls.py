@@ -20,7 +20,8 @@ from django.urls import path, include
 
 
 urlpatterns = [
-                  path('admin/', admin.site.urls),  # Django admin route
-                  path("", include("authentication.urls")),  # Auth routes - login / register
-                  path("", include("cursos.urls")),
-              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path("admin/", admin.site.urls),  # Django admin route
+    path("", include("authentication.urls")),  # Auth routes - login / register
+    path("", include("cursos.urls")),
+    path("", include("pessoas.urls")),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

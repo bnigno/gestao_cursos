@@ -4,7 +4,7 @@ import re
 import pylightxl as xl
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
 from django.db.models import Prefetch, F, Count, Q, Value
@@ -44,7 +44,8 @@ from cursos.models import (
 )
 
 
-class HomeView(LoginRequiredMixin, ListView):
+class HomeView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "cursos.view_curso"
     model = Turma
     queryset = Turma.objects.select_related("curso").all()
     template_name = "cursos/dashboard.html"
@@ -110,20 +111,27 @@ class HomeView(LoginRequiredMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class ProfessorListView(LoginRequiredMixin, ListView):
+class ProfessorListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "cursos.view_professor"
     model = Professor
     template_name = "cursos/professor_list.html"
     login_required()
 
 
-class ProfessorCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class ProfessorCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
+):
+    permission_required = "cursos.add_professor"
     model = Professor
     fields = ["nome", "cpf"]
     success_url = reverse_lazy("listar-professores")
     success_message = "Professor %(nome)s criado com sucesso."
 
 
-class ProfessorUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class ProfessorUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView
+):
+    permission_required = "cursos.change_professor"
     model = Professor
     fields = ["nome", "cpf"]
     success_message = "Professor %(nome)s alterado com sucesso."
@@ -131,14 +139,20 @@ class ProfessorUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy("listar-professores")
 
 
-class ProfessorDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+class ProfessorDeleteView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, DeleteView
+):
+    permission_required = "cursos.delete_professor"
     model = Professor
     success_message = "Professor removido com sucesso."
     template_name = "cursos/professor_form_delete.html"
     success_url = reverse_lazy("listar-professores")
 
 
-class DadosPagamentoCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class DadosPagamentoCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
+):
+    permission_required = "cursos.view_dadospagamentos"
     model = DadosPagamentos
     fields = ["tipo_pagamento", "chave_pix", "banco", "agencia", "conta", "tipo_conta"]
     template_name = "cursos/dados_pagamento_form.html"
@@ -182,7 +196,10 @@ class DadosPagamentoCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateVi
         return redirect(reverse("listar-professores"))
 
 
-class DadosPagamentoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class DadosPagamentoUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView
+):
+    permission_required = "cursos.change_dadospagamentos"
     model = DadosPagamentos
     fields = ["tipo_pagamento", "chave_pix", "banco", "agencia", "conta", "tipo_conta"]
     template_name = "cursos/dados_pagamento_form.html"
@@ -226,7 +243,8 @@ class DadosPagamentoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateVi
         return redirect(reverse("listar-professores"))
 
 
-class AlunoListView(LoginRequiredMixin, ListView):
+class AlunoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "cursos.view_aluno"
     model = Aluno
     queryset = (
         Aluno.objects.select_related(
@@ -238,7 +256,10 @@ class AlunoListView(LoginRequiredMixin, ListView):
     template_name = "cursos/aluno_list.html"
 
 
-class AlunoCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class AlunoCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
+):
+    permission_required = "cursos.add_aluno"
     model = Aluno
     fields = ["nome", "cpf"]
     success_url = reverse_lazy("cadastrar-alunos")
@@ -262,7 +283,10 @@ class AlunoCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return redirect(self.success_url)
 
 
-class AlunoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class AlunoUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView
+):
+    permission_required = "cursos.change_aluno"
     model = Aluno
     fields = ["nome", "cpf"]
     success_message = "Aluno %(nome)s alterado com sucesso."
@@ -302,26 +326,36 @@ class AlunoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return redirect(self.success_url)
 
 
-class AlunoDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+class AlunoDeleteView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, DeleteView
+):
+    permission_required = "cursos.delete_aluno"
     model = Aluno
     success_message = "Aluno removido com sucesso."
     template_name = "cursos/aluno_form_delete.html"
     success_url = reverse_lazy("listar-alunos")
 
 
-class CursoListView(LoginRequiredMixin, ListView):
+class CursoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "cursos.view_curso"
     model = Curso
     template_name = "cursos/curso_list.html"
 
 
-class CursoCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class CursoCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
+):
+    permission_required = "cursos.add_curso"
     model = Curso
     fields = ["nome", "carga_horaria"]
     success_url = reverse_lazy("listar-cursos")
     success_message = "Curso %(nome)s criado com sucesso."
 
 
-class CursoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class CursoUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView
+):
+    permission_required = "cursos.change_curso"
     model = Curso
     fields = ["nome", "carga_horaria"]
     success_message = "Curso %(nome)s alterado com sucesso."
@@ -329,14 +363,18 @@ class CursoUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy("listar-cursos")
 
 
-class CursoDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+class CursoDeleteView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, DeleteView
+):
+    permission_required = "cursos.delete_curso"
     model = Curso
     success_message = "Curso removido com sucesso."
     template_name = "cursos/curso_form_delete.html"
     success_url = reverse_lazy("listar-cursos")
 
 
-class TurmaListView(LoginRequiredMixin, ListView):
+class TurmaListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "cursos.view_turma"
     model = Turma
     queryset = (
         Turma.objects.select_related("curso", "professor", "municipio")
@@ -346,7 +384,10 @@ class TurmaListView(LoginRequiredMixin, ListView):
     template_name = "cursos/turma_list.html"
 
 
-class TurmaCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class TurmaCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
+):
+    permission_required = "cursos.add_turma"
     model = Turma
     template_name = "cursos/turma_form.html"
     form_class = TurmaForm
@@ -383,7 +424,10 @@ class TurmaCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return redirect(reverse("listar-turmas"))
 
 
-class TurmaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class TurmaUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView
+):
+    permission_required = "cursos.change_turma"
     model = Turma
     template_name = "cursos/turma_form_update.html"
     form_class = TurmaForm
@@ -450,14 +494,20 @@ class TurmaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return redirect(reverse("listar-turmas"))
 
 
-class TurmaDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+class TurmaDeleteView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, DeleteView
+):
+    permission_required = "cursos.delete_turma"
     model = Turma
     success_message = "Turma removida com sucesso."
     template_name = "cursos/turma_form_delete.html"
     success_url = reverse_lazy("listar-turmas")
 
 
-class FrequenciaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class FrequenciaUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView
+):
+    permission_required = "cursos.change_frequencia"
     model = Turma
     fields = []
     template_name = "cursos/frequencia_form.html"
@@ -529,7 +579,11 @@ class FrequenciaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return HttpResponseRedirect(success_url)
 
 
-class PresencaUpdateLoteView(LoginRequiredMixin, SuccessMessageMixin, FormView):
+class PresencaUpdateLoteView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, FormView
+):
+    permission_required = "cursos.change_frequencia"
+
     def post(self, request, *args, **kwargs):
         PresencaFormset = modelformset_factory(
             FrequenciaAluno, form=PresencaForm, extra=0
@@ -547,7 +601,10 @@ class PresencaUpdateLoteView(LoginRequiredMixin, SuccessMessageMixin, FormView):
         return HttpResponseRedirect(success_url)
 
 
-class PresencaView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
+class PresencaView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, DetailView
+):
+    permission_required = "cursos.view_frequencia"
     model = Turma
     queryset = (
         Turma.objects.select_related("curso")
@@ -603,7 +660,10 @@ class PresencaView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class PresencaAlunoView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
+class PresencaAlunoView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, DetailView
+):
+    permission_required = "cursos.view_frequencia"
     model = Turma
     queryset = (
         Turma.objects.select_related("curso")
@@ -690,7 +750,10 @@ class GetTemplateAlunos(View):
         return response
 
 
-class PlanilhaAlunosView(LoginRequiredMixin, SuccessMessageMixin, FormView):
+class PlanilhaAlunosView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, FormView
+):
+    permission_required = "cursos.add_aluno"
     template_name = "cursos/planilha_form.html"
     form_class = SendPlanilhaForm
     success_url = reverse_lazy("listar-alunos")
