@@ -3,9 +3,12 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+from django.contrib.auth import authenticate, login
+
 # Create your views here.
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.urls import reverse_lazy
+
 from .forms import LoginForm, SignUpForm
 
 
@@ -22,11 +25,15 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect("/")
+                grupos = user.groups.all()
+                if grupos and grupos[0].name == "somente_pessoas":
+                    return redirect(reverse_lazy("listar-pessoas"))
+                else:
+                    return redirect("/")
             else:
-                msg = 'Credenciais Inválidas'
+                msg = "Credenciais Inválidas"
         else:
-            msg = 'Erro ao validar formulário'
+            msg = "Erro ao validar formulário"
 
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
 
@@ -49,8 +56,12 @@ def register_user(request):
             # return redirect("/login/")
 
         else:
-            msg = 'Form is not valid'
+            msg = "Form is not valid"
     else:
         form = SignUpForm()
 
-    return render(request, "accounts/register.html", {"form": form, "msg": msg, "success": success})
+    return render(
+        request,
+        "accounts/register.html",
+        {"form": form, "msg": msg, "success": success},
+    )
