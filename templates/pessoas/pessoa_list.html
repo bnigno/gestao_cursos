@@ -69,6 +69,7 @@
                                 <th class="border-0">Seção</th>
                                 <th class="border-0">Escola</th>
                                 <th class="border-0">Localidade</th>
+                                <th class="border-0">Lideranca</th>
                                 <th class="border-0 rounded-end">Ações</th>
                             </tr>
                             </thead>
@@ -80,6 +81,7 @@
                                     <td class="border-0">{{ pessoa.secao|default_if_none:"" }}</td>
                                     <td class="border-0">{{ pessoa.escola|default_if_none:"" }}</td>
                                     <td class="border-0">{{ pessoa.localidade|default_if_none:"" }}</td>
+                                    <td class="border-0">{{ pessoa.lideranca.nome }}</td>
                                     <td class="border-0">
                                         <a href="{% url 'gerenciar-pessoa' pk=pessoa.id %}" class="edit"
                                            tabindex="0" data-bs-toggle="popover" data-bs-placement="top"

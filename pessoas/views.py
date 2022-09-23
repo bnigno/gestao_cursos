@@ -3,13 +3,13 @@ import unicodedata
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
-from cursos.forms import SendPlanilhaForm
+from pessoas.forms import SendPlanilhaPessoaForm
 from pessoas.models import Pessoa
 
 
@@ -98,39 +98,76 @@ class GetTemplatePessoas(View):
 
 class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
     template_name = "pessoas/planilha_form.html"
-    form_class = SendPlanilhaForm
+    form_class = SendPlanilhaPessoaForm
     success_url = reverse_lazy("listar-pessoas")
     success_message = "Planilha importada com sucesso"
 
     def post(self, request, *args, **kwargs):
-        form = SendPlanilhaForm(request.POST, request.FILES)
+        form = SendPlanilhaPessoaForm(request.POST, request.FILES)
         erros = []
+        duplicados = []
+        sucesso = []
         if form.is_valid():
+            filename = request.FILES["arquivo"].name
             db = xl.readxl(form.cleaned_data["arquivo"])
+            lider = form.cleaned_data["lideranca"]
             for row in db.ws(ws=db.ws_names[0]).rows:
                 if row[1] and row[1] != "NOME":
+                    nome = sanitize_str(row[1])
+                    pessoa_existente = (
+                        Pessoa.objects.prefetch_related("lideranca")
+                        .filter(nome=nome)
+                        .first()
+                    )
+                    if pessoa_existente:
+                        duplicados.append(
+                            {
+                                "nome": row[1],
+                                "lideranca": pessoa_existente.lideranca.nome,
+                                "status": "Apagado",
+                            }
+                        )
+                        pessoa_existente.delete()
+                        continue
                     pessoa = Pessoa()
-                    pessoa.nome = row[1]
+                    pessoa.nome = nome
                     pessoa.zona = row[2]
-                    pessoa.secao = row[3]
-                    pessoa.escola = row[4]
-                    pessoa.localidade = row[5]
+                    pessoa.secao = row[3] if row[3] else None
+                    pessoa.escola = sanitize_str(row[4])
+                    pessoa.localidade = sanitize_str(row[5])
+                    pessoa.lideranca = lider
                     try:
                         pessoa.save()
+                        sucesso.append(
+                            {
+                                "nome": pessoa.nome,
+                                "lideranca": lider.nome,
+                                "status": "Criado",
+                            }
+                        )
                     except Exception as e:
                         erros.append(
-                            {"numero": row[0], "erro": str(e).splitlines()[-1]}
+                            {
+                                "numero": row[0],
+                                "nome": nome,
+                                "erro": str(e).splitlines()[-1],
+                            }
                         )
 
         if not erros:
             messages.success(self.request, self.success_message)
         else:
-            messages.warning(
+            messages.error(
                 self.request,
                 f"Houveram {len(erros)} erros durante o processamento da planilha.",
             )
-            for erro in erros:
-                messages.warning(
-                    self.request, f"Erro na entrada Nº {erro['numero']}: {erro['erro']}"
-                )
-        return HttpResponseRedirect(self.success_url)
+        return render(
+            self.request,
+            "pessoas/status_planilha.html",
+            context={
+                "sucessos": sucesso,
+                "erros": erros,
+                "duplicados": duplicados,
+                "filename": filename,
+            },
+        )
