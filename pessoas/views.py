@@ -30,7 +30,7 @@ class PessoaListView(LoginRequiredMixin, ListView):
 
 class PessoaCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Pessoa
-    fields = ["nome", "zona", "secao", "escola", "localidade"]
+    fields = ["nome", "lideranca", "zona", "secao", "escola", "localidade"]
     success_url = reverse_lazy("cadastrar-pessoas")
     success_message = "Pessoa %(nome)s criada com sucesso."
 
@@ -52,7 +52,7 @@ class PessoaCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
 class PessoaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Pessoa
-    fields = ["nome", "zona", "secao", "escola", "localidade"]
+    fields = ["nome", "lideranca", "zona", "secao", "escola", "localidade", "lideranca"]
     success_message = "Pessoa %(nome)s alterada com sucesso."
     template_name = "pessoas/pessoa_form_update.html"
     success_url = reverse_lazy("listar-pessoas")
