@@ -7,6 +7,9 @@ class Lideranca(models.Model):
     def __str__(self):
         return self.nome
 
+    class Meta:
+        ordering = ["nome"]
+
 
 class Pessoa(models.Model):
     nome = models.CharField(max_length=500, verbose_name="Nome", unique=True)
