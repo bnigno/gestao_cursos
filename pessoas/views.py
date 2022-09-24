@@ -24,13 +24,13 @@ def sanitize_str(texto):
 
 class PessoaListView(LoginRequiredMixin, ListView):
     model = Pessoa
-    queryset = Pessoa.objects.all()
+    queryset = Pessoa.objects.select_related("secao__escola").all()
     template_name = "pessoas/pessoa_list.html"
 
 
 class PessoaCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Pessoa
-    fields = ["nome", "lideranca", "zona", "secao", "escola", "localidade"]
+    fields = ["nome", "lideranca", "zona", "secao"]
     success_url = reverse_lazy("cadastrar-pessoas")
     success_message = "Pessoa %(nome)s criada com sucesso."
 
@@ -38,10 +38,6 @@ class PessoaCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         success_message = self.get_success_message(form.cleaned_data)
         self.object = form.save(commit=False)
         self.object.nome = sanitize_str(self.object.nome)
-        if self.object.escola:
-            self.object.escola = sanitize_str(self.object.escola)
-        if self.object.localidade:
-            self.object.localidade = sanitize_str(self.object.localidade)
         self.object.save()
 
         if success_message:
@@ -52,7 +48,7 @@ class PessoaCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
 class PessoaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Pessoa
-    fields = ["nome", "lideranca", "zona", "secao", "escola", "localidade"]
+    fields = ["nome", "lideranca", "zona", "secao"]
     success_message = "Pessoa %(nome)s alterada com sucesso."
     template_name = "pessoas/pessoa_form_update.html"
     success_url = reverse_lazy("listar-pessoas")
@@ -104,6 +100,7 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
 
     def post(self, request, *args, **kwargs):
         form = SendPlanilhaPessoaForm(request.POST, request.FILES)
+        filename = []
         erros = []
         duplicados = []
         sucesso = []
@@ -132,9 +129,7 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
                     pessoa = Pessoa()
                     pessoa.nome = nome
                     pessoa.zona = row[2]
-                    pessoa.secao = row[3] if row[3] else None
-                    pessoa.escola = sanitize_str(row[4])
-                    pessoa.localidade = sanitize_str(row[5])
+                    pessoa.secao_id = row[3] if row[3] else None
                     pessoa.lideranca = lider
                     try:
                         pessoa.save()
