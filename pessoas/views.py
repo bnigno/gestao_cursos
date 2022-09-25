@@ -10,7 +10,7 @@ from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
 from pessoas.forms import SendPlanilhaPessoaForm
-from pessoas.models import Pessoa
+from pessoas.models import Pessoa, Secao
 
 
 def sanitize_str(texto):
@@ -104,6 +104,7 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
         erros = []
         duplicados = []
         sucesso = []
+        secoes = [secao.id for secao in Secao.objects.all()]
         if form.is_valid():
             filename = request.FILES["arquivo"].name
             db = xl.readxl(form.cleaned_data["arquivo"])
@@ -116,6 +117,7 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
                         .filter(nome=nome)
                         .first()
                     )
+
                     if pessoa_existente:
                         duplicados.append(
                             {
@@ -126,10 +128,27 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
                         )
                         pessoa_existente.delete()
                         continue
+
+                    secao = row[3] if row[3] else None
+                    if secao:
+                        try:
+                            secao = int(secao)
+                            if secao not in secoes:
+                                secao = None
+                        except Exception as e:
+                            erros.append(
+                                {
+                                    "numero": row[0],
+                                    "nome": nome,
+                                    "erro": f"Seção deve ser um número válido. Encontrado {secao}",
+                                }
+                            )
+                            continue
+
                     pessoa = Pessoa()
                     pessoa.nome = nome
                     pessoa.zona = row[2]
-                    pessoa.secao_id = row[3] if row[3] else None
+                    pessoa.secao_id = secao
                     pessoa.lideranca = lider
                     try:
                         pessoa.save()
