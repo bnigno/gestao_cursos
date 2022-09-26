@@ -111,7 +111,7 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
             filename = request.FILES["arquivo"].name
             db = xl.readxl(form.cleaned_data["arquivo"])
             for row in db.ws(ws=db.ws_names[0]).rows:
-                if row[1] and row[1] != "NOME":
+                if len(row > 1) and row[1] and row[1] != "NOME":
                     nome = sanitize_str(row[1])
                     lider = sanitize_str(row[6])
                     pessoa_existente = (
