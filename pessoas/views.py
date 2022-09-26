@@ -10,7 +10,7 @@ from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
 from pessoas.forms import SendPlanilhaPessoaForm
-from pessoas.models import Pessoa, Secao
+from pessoas.models import Pessoa, Secao, Lideranca
 
 
 def sanitize_str(texto):
@@ -103,15 +103,17 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
         filename = []
         erros = []
         duplicados = []
+        duplicados_dict = {}
         sucesso = []
         secoes = [secao.id for secao in Secao.objects.all()]
+        liderancas = {lider.nome: lider for lider in Lideranca.objects.all()}
         if form.is_valid():
             filename = request.FILES["arquivo"].name
             db = xl.readxl(form.cleaned_data["arquivo"])
-            lider = form.cleaned_data["lideranca"]
             for row in db.ws(ws=db.ws_names[0]).rows:
                 if row[1] and row[1] != "NOME":
                     nome = sanitize_str(row[1])
+                    lider = sanitize_str(row[6])
                     pessoa_existente = (
                         Pessoa.objects.prefetch_related("lideranca")
                         .filter(nome=nome)
@@ -119,14 +121,32 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
                     )
 
                     if pessoa_existente:
-                        duplicados.append(
+                        if pessoa_existente.id not in duplicados_dict:
+                            duplicados_dict[pessoa_existente.id] = {
+                                "nome": pessoa_existente.nome,
+                                "liderancas": [],
+                            }
+                        if (
+                            pessoa_existente.lideranca.nome
+                            not in duplicados_dict[pessoa_existente.id]["liderancas"]
+                        ):
+                            duplicados_dict[pessoa_existente.id]["liderancas"].append(
+                                pessoa_existente.lideranca.nome
+                            )
+
+                        duplicados_dict[pessoa_existente.id]["liderancas"].append(lider)
+                        continue
+
+                    if lider in liderancas.keys():
+                        lider = liderancas[lider]
+                    else:
+                        erros.append(
                             {
-                                "nome": row[1],
-                                "lideranca": pessoa_existente.lideranca.nome,
-                                "status": "Apagado",
+                                "numero": row[0],
+                                "nome": nome,
+                                "erro": f"Líder não encontrado: {lider}",
                             }
                         )
-                        pessoa_existente.delete()
                         continue
 
                     secao = row[3] if row[3] else None
@@ -167,6 +187,16 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
                                 "erro": str(e).splitlines()[-1],
                             }
                         )
+        for key, value in duplicados_dict.items():
+            duplicados.append(
+                {
+                    "nome": value["nome"],
+                    "liderancas": ", ".join(value["liderancas"]),
+                    "status": "Apagado",
+                }
+            )
+        if duplicados_dict:
+            Pessoa.objects.filter(id__in=duplicados_dict.keys()).delete()
 
         if not erros:
             messages.success(self.request, self.success_message)
