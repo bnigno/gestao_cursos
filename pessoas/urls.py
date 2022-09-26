@@ -28,4 +28,9 @@ urlpatterns = [
         views.PlanilhaPessoasView.as_view(),
         name="planilha-pessoas",
     ),
+    path(
+        "pessoas-estatisticas/",
+        views.EstatisticasView.as_view(),
+        name="estatisticas-pessoas",
+    ),
 ]

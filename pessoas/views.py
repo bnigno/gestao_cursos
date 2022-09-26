@@ -3,6 +3,7 @@ import unicodedata
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -215,3 +216,38 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
                 "filename": filename,
             },
         )
+
+
+class EstatisticasView(LoginRequiredMixin, ListView):
+    model = Pessoa
+    queryset = Pessoa.objects.select_related("secao__escola", "lideranca").all()
+    template_name = "pessoas/estatisticas.html"
+
+    def get_context_data(self, **kwargs):
+        kwargs["total"] = self.get_queryset().count()
+
+        kwargs["pessoas_secao"] = (
+            Pessoa.objects.order_by("secao_id")
+            .values("secao_id")
+            .annotate(qtd=Count("id"))
+        )
+
+        kwargs["pessoas_escola"] = (
+            Pessoa.objects.values("secao__escola__nome")
+            .annotate(qtd=Count("id"))
+            .order_by("-qtd")
+        )
+
+        kwargs["pessoas_lideranca"] = (
+            Pessoa.objects.values("lideranca__nome")
+            .annotate(qtd=Count("id"))
+            .order_by("lideranca__nome")
+        )
+
+        kwargs["pessoas_local"] = (
+            Pessoa.objects.values("secao__escola__localidade")
+            .annotate(qtd=Count("id"))
+            .order_by("secao__escola__localidade")
+        )
+
+        return super().get_context_data(**kwargs)
