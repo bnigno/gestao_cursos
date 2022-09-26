@@ -24,7 +24,7 @@ def sanitize_str(texto):
 
 class PessoaListView(LoginRequiredMixin, ListView):
     model = Pessoa
-    queryset = Pessoa.objects.select_related("secao__escola").all()
+    queryset = Pessoa.objects.select_related("secao__escola", "lideranca").all()
     template_name = "pessoas/pessoa_list.html"
 
 
