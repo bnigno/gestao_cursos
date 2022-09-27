@@ -8,7 +8,14 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
+from django.views.generic import (
+    ListView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+    FormView,
+    DetailView,
+)
 
 from pessoas.forms import SendPlanilhaPessoaForm
 from pessoas.models import Pessoa, Secao, Lideranca
@@ -239,7 +246,7 @@ class EstatisticasView(LoginRequiredMixin, ListView):
         )
 
         kwargs["pessoas_lideranca"] = (
-            Pessoa.objects.values("lideranca__nome")
+            Pessoa.objects.values("lideranca_id", "lideranca__nome")
             .annotate(qtd=Count("id"))
             .order_by("lideranca__nome")
         )
@@ -251,3 +258,24 @@ class EstatisticasView(LoginRequiredMixin, ListView):
         )
 
         return super().get_context_data(**kwargs)
+
+
+class LiderancaDetailView(LoginRequiredMixin, DetailView):
+    model = Lideranca
+    queryset = Lideranca.objects.all()
+    template_name = "pessoas/lideranca_details.html"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        result = (
+            Lideranca.objects.filter(id=self.object.id)
+            .values("pessoas__secao__escola__nome")
+            .annotate(qtd=Count("pessoas"))
+            .values(
+                "qtd",
+                "pessoas__secao__escola__nome",
+                "pessoas__secao__escola__localidade",
+            )
+        )
+        context = self.get_context_data(object=self.object, result=result)
+        return self.render_to_response(context)
