@@ -99,15 +99,13 @@
                         },
                         {
                             extend: 'pdfHtml5',
-                            exportOptions: {
-                                columns: ":not(:contains('Ações'))"
-                            }
+                            title: "Detalhes da Liderança {{ object.nome }}",
+                            pageSize: 'A4',
+                            download: "open",
                         },
                         {
                             extend: 'print',
-                            exportOptions: {
-                                columns: ":not(:contains('Ações'))"
-                            }
+                            title: "Detalhes da Liderança {{ object.nome }}",
                         },
                         {
                             extend: 'searchBuilder',
