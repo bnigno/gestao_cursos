@@ -115,6 +115,10 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
         sucesso = []
         secoes = [secao.id for secao in Secao.objects.all()]
         liderancas = {lider.nome: lider for lider in Lideranca.objects.all()}
+        pessoas_dict = {
+            pessoa.nome: pessoa
+            for pessoa in Pessoa.objects.prefetch_related("lideranca").all()
+        }
         if form.is_valid():
             filename = request.FILES["arquivo"].name
             db = xl.readxl(form.cleaned_data["arquivo"])
@@ -122,11 +126,7 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
                 if len(row) > 1 and row[1] and row[1] != "NOME":
                     nome = sanitize_str(row[1])
                     lider = sanitize_str(row[6])
-                    pessoa_existente = (
-                        Pessoa.objects.prefetch_related("lideranca")
-                        .filter(nome=nome)
-                        .first()
-                    )
+                    pessoa_existente = pessoas_dict.get(nome)
 
                     if pessoa_existente:
                         if pessoa_existente.id not in duplicados_dict:
@@ -187,6 +187,7 @@ class PlanilhaPessoasView(LoginRequiredMixin, SuccessMessageMixin, FormView):
                                 "status": "Criado",
                             }
                         )
+                        pessoas_dict[pessoa.nome] = pessoa
                     except Exception as e:
                         erros.append(
                             {
