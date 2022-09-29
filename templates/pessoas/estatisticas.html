@@ -7,6 +7,28 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+    <div class="py-4">
+        <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item">
+                    <a href="#">
+                        <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                    </a>
+                </li>
+                <li class="breadcrumb-item active"><a href="{% url 'estatisticas-pessoas' %}">Estatísticas</a></li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">Estatísticas de Pessoas</h1>
+                <p class="mb-0">Detalhes das Estatísticas</p>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-12 col-xl-12">
@@ -21,270 +43,194 @@
                             </div>
                         </div>
                             <div class="card-body">
-                            <table id="pessoa-list" class="table table-striped table-sm table-centered table-nowrap mb-0 rounded">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th class="border-bottom">Liderança</th>
-                                        <th class="border-bottom">Quantidade</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for lider in pessoas_lideranca %}
+                            <nav>
+                              <div class="nav nav-tabs mb-4" id="nav-tab-liderancas" role="tablist">
+                                <a class="nav-item nav-link active" id="nav-tabela-tab-liderancas" data-bs-toggle="tab" href="#nav-tabela-liderancas" role="tab" aria-controls="nav-tabela-liderancas" aria-selected="true"><i class="fa-solid fa-table"></i> Tabela</a>
+                                <a class="nav-item nav-link" id="nav-grafico-tab-liderancas" data-bs-toggle="tab" href="#nav-grafico-liderancas" role="tab" aria-controls="nav-grafico-liderancas" aria-selected="false"><i class="fa-solid fa-bar-chart"></i> Gráfico</a>
+                              </div>
+                            </nav>
+                            <div class="tab-content" id="nav-tabContent-liderancas">
+                              <div class="tab-pane fade show active" id="nav-tabela-liderancas" role="tabpanel" aria-labelledby="nav-tabela-liderancas">
+                                  <table id="liderancas-list" class="table table-striped table-sm table-centered table-nowrap mb-0 rounded">
+                                    <thead class="thead-light">
                                         <tr>
-                                            <td><a class="text-info mr-3" href="{% url 'detalhes_lideranca' pk=lider.lideranca_id %}">{{ lider.lideranca__nome }}</a></td>
-                                            <td>{{ lider.qtd }}</td>
+                                            <th class="border-bottom">Liderança</th>
+                                            <th class="border-bottom">Quantidade</th>
                                         </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {% for lider in pessoas_lideranca %}
+                                            <tr>
+                                                <td><a class="text-info mr-3" href="{% url 'detalhes_lideranca' pk=lider.lideranca_id %}">{{ lider.lideranca__nome }}</a></td>
+                                                <td>{{ lider.qtd }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                              </div>
+                              <div class="tab-pane fade" id="nav-grafico-liderancas" role="tabpanel" aria-labelledby="nav-grafico-liderancas"><div id="container-liderancas"></div></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card border-light shadow-sm">
-                <div class="card-header d-flex flex-row align-items-center flex-0 border-bottom">
-                    <div class="d-block">
-                        <div class="h3 fon  t-weight-normal text-gray mb-2">Pessoas por liderança</div>
+        <div class="col-12 col-xl-12">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h2 class="fs-5 fw-bold mb-0">Localidades</h2>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="card-body">
+                            <nav>
+                              <div class="nav nav-tabs mb-4" id="nav-tab-localidade" role="tablist">
+                                <a class="nav-item nav-link active" id="nav-tabela-tab-localidade" data-bs-toggle="tab" href="#nav-tabela-localidade" role="tab" aria-controls="nav-tabela-localidade" aria-selected="true"><i class="fa-solid fa-table"></i> Tabela</a>
+                                <a class="nav-item nav-link" id="nav-grafico-tab-localidade" data-bs-toggle="tab" href="#nav-grafico-localidade" role="tab" aria-controls="nav-grafico-localidade" aria-selected="false"><i class="fa-solid fa-bar-chart"></i> Gráfico</a>
+                              </div>
+                            </nav>
+                            <div class="tab-content" id="nav-tabContent-localidade">
+                              <div class="tab-pane fade show active" id="nav-tabela-localidade" role="tabpanel" aria-labelledby="nav-tabela-localidade">
+                                  <table id="localidade-list" class="table table-striped table-sm table-centered table-nowrap mb-0 rounded">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th class="border-bottom">Localidade</th>
+                                            <th class="border-bottom">Quantidade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in pessoas_local %}
+                                            <tr>
+                                                <td>{{ row.secao__escola__localidade|default_if_none:"--" }}</td>
+                                                <td>{{ row.qtd }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                              </div>
+                              <div class="tab-pane fade" id="nav-grafico-localidade" role="tabpanel" aria-labelledby="nav-grafico-localidade"><div id="container-localidade"></div></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <canvas id="chartByLeader" width="300" height="50"></canvas>
             </div>
         </div>
     </div>
-
+    
     <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card border-light shadow-sm">
-                <div class="card-header d-flex flex-row align-items-center flex-0 border-bottom">
-                    <div class="d-block">
-                        <div class="h3 fon  t-weight-normal text-gray mb-2">Pessoas por local</div>
+        <div class="col-12 col-xl-12">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h2 class="fs-5 fw-bold mb-0">Escolas</h2>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="card-body">
+                            <nav>
+                              <div class="nav nav-tabs mb-4" id="nav-tab-escola" role="tablist">
+                                <a class="nav-item nav-link active" id="nav-tabela-tab-escola" data-bs-toggle="tab" href="#nav-tabela-escola" role="tab" aria-controls="nav-tabela-escola" aria-selected="true"><i class="fa-solid fa-table"></i> Tabela</a>
+                                <a class="nav-item nav-link" id="nav-grafico-tab-escola" data-bs-toggle="tab" href="#nav-grafico-escola" role="tab" aria-controls="nav-grafico-escola" aria-selected="false"><i class="fa-solid fa-bar-chart"></i> Gráfico</a>
+                              </div>
+                            </nav>
+                            <div class="tab-content" id="nav-tabContent-escola">
+                              <div class="tab-pane fade show active" id="nav-tabela-escola" role="tabpanel" aria-labelledby="nav-tabela-escola">
+                                  <table id="escola-list" class="table table-striped table-sm table-centered table-nowrap mb-0 rounded">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th class="border-bottom">Escola</th>
+                                            <th class="border-bottom">Quantidade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in pessoas_escola %}
+                                            <tr>
+                                                <td>{{ row.secao__escola__nome|default_if_none:"--" }}</td>
+                                                <td>{{ row.qtd }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                              </div>
+                              <div class="tab-pane fade" id="nav-grafico-escola" role="tabpanel" aria-labelledby="nav-grafico-escola"><div id="container-escola"></div></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <canvas id="chartByLocal" width="300" height="50"></canvas>
             </div>
         </div>
     </div>
-
+    
     <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card border-light shadow-sm">
-                <div class="card-header d-flex flex-row align-items-center flex-0 border-bottom">
-                    <div class="d-block">
-                        <div class="h3 fon  t-weight-normal text-gray mb-2">Pessoas por escola</div>
+        <div class="col-12 col-xl-12">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h2 class="fs-5 fw-bold mb-0">Seções</h2>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="card-body">
+                            <nav>
+                              <div class="nav nav-tabs mb-4" id="nav-tab-secao" role="tablist">
+                                <a class="nav-item nav-link active" id="nav-tabela-tab-secao" data-bs-toggle="tab" href="#nav-tabela-secao" role="tab" aria-controls="nav-tabela-secao" aria-selected="true"><i class="fa-solid fa-table"></i> Tabela</a>
+                                <a class="nav-item nav-link" id="nav-grafico-tab-secao" data-bs-toggle="tab" href="#nav-grafico-secao" role="tab" aria-controls="nav-grafico-secao" aria-selected="false"><i class="fa-solid fa-bar-chart"></i> Gráfico</a>
+                              </div>
+                            </nav>
+                            <div class="tab-content" id="nav-tabContent-secao">
+                              <div class="tab-pane fade show active" id="nav-tabela-secao" role="tabpanel" aria-labelledby="nav-tabela-secao">
+                                  <table id="secao-list" class="table table-striped table-sm table-centered table-nowrap mb-0 rounded">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th class="border-bottom">Seção</th>
+                                            <th class="border-bottom">Quantidade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in pessoas_secao %}
+                                            <tr>
+                                                <td>{{ row.secao_id|default_if_none:"--" }}</td>
+                                                <td>{{ row.qtd }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                              </div>
+                              <div class="tab-pane fade" id="nav-grafico-secao" role="tabpanel" aria-labelledby="nav-grafico-secao"><div id="container-secao"></div></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <canvas id="chartBySchool" width="300" height="50"></canvas>
             </div>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card border-light shadow-sm">
-                <div class="card-header d-flex flex-row align-items-center flex-0 border-bottom">
-                    <div class="d-block">
-                        <div class="h3 fon  t-weight-normal text-gray mb-2">Pessoas por seção</div>
-                    </div>
-                </div>
-                <canvas id="chartBySection" width="300" height="50"></canvas>
-            </div>
-        </div>
-    </div>
-
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
     <script type="text/javascript"
             src="https://cdn.datatables.net/v/bs5/jq-3.6.0/jszip-2.5.0/dt-1.12.0/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.3/r-2.3.0/rg-1.2.0/rr-1.2.8/sc-2.0.6/sb-1.3.3/sp-2.0.1/sl-1.4.0/sr-1.1.1/datatables.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+
     <script>
-        const ctx = document.getElementById('chartBySection');
-        const chartSection = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: [{% for result in pessoas_secao %} '{{ result.secao_id|default_if_none:"Sem seção" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
-                datasets: [{
-                    label: 'Quantidade',
-                    data: [{% for result in pessoas_secao %} '{{ result.qtd }}'{% if not forloop.last %},{% endif %}{% endfor %}],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                },
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                }
-            }
-        });
-
-        const ctx2 = document.getElementById('chartBySchool');
-        const chartSchool = new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: [{% for result in pessoas_escola %} '{{ result.secao__escola__nome|default_if_none:"Escola não identificada" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
-                datasets: [{
-                    label: 'Quantidade',
-                    data: [{% for result in pessoas_escola %} '{{ result.qtd }}'{% if not forloop.last %},{% endif %}{% endfor %}],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    },
-                    x: {
-                        display: false
-                    },
-                },
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                }
-            }
-        });
-
-        const ctx3 = document.getElementById('chartByLeader');
-        const chartLeader = new Chart(ctx3, {
-            type: 'bar',
-            data: {
-                labels: [{% for result in pessoas_lideranca %} '{{ result.lideranca__nome|default_if_none:"" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
-                datasets: [{
-                    label: 'Quantidade',
-                    data: [{% for result in pessoas_lideranca %} '{{ result.qtd }}'{% if not forloop.last %},{% endif %}{% endfor %}],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    },
-                    x: {
-                        display: true
-                    },
-                },
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                }
-            }
-        });
-
-        const ctx4 = document.getElementById('chartByLocal');
-        const chartLocal = new Chart(ctx4, {
-            type: 'bar',
-            data: {
-                labels: [{% for result in pessoas_local %} '{{ result.secao__escola__localidade|default_if_none:"Sem localidade" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
-                datasets: [{
-                    label: 'Quantidade',
-                    data: [{% for result in pessoas_local %} '{{ result.qtd }}'{% if not forloop.last %},{% endif %}{% endfor %}],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    },
-                    x: {
-                        display: true
-                    },
-                },
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                }
-            }
-        });
-
+    {% localize off %}
         $(document).ready(function () {
-            const table = $('#pessoa-list').DataTable(
+            const table_liderancas = $('#liderancas-list').DataTable(
                 {
                     language: {
                         url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/pt-BR.json'
@@ -307,13 +253,15 @@
                             exportOptions: {
                                 columns: ":not(:contains('Ações'))"
                             },
-                            download: "open"
+                            download: "open",
+                            messageBottom: '\nTotal de Pessoas: {{ total }}'
                         },
                         {
                             extend: 'print',
                             exportOptions: {
                                 columns: ":not(:contains('Ações'))"
-                            }
+                            },
+                            messageBottom: '<br><p class="lead"><strong>Total de Pessoas: {{ total }}</strong></p>',
                         },
                     ],
                     dom: 'Brtip',
@@ -325,7 +273,296 @@
                     ],
                 }
             );
+
+            Highcharts.chart('container-liderancas', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Distribuição por Liderança'
+                },
+                xAxis: {
+                    categories: [{% for result in pessoas_lideranca %} '{{ result.lideranca__nome|default_if_none:"" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+                    crosshair: true
+                },
+                yAxis: {
+                    title: {
+                        useHTML: true,
+                        text: 'Nº de Pessoas'
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                },
+                series: [{
+                    name: 'Nº de Pessoas',
+                    data: [{% for result in pessoas_lideranca %} {{ result.qtd }}{% if not forloop.last %},{% endif %}{% endfor %}]
+
+                }],
+                colors: ['#1F2937']
+            });
+
+            const table_localidades = $('#localidade-list').DataTable(
+                {
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/pt-BR.json'
+                    },
+                    buttons: [
+                        {
+                            extend: 'copyHtml5',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            }
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            },
+                            download: "open",
+                            messageBottom: '\nTotal de Pessoas: {{ total }}'
+                        },
+                        {
+                            extend: 'print',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            },
+                            messageBottom: '<br><p class="lead"><strong>Total de Pessoas: {{ total }}</strong></p>',
+                        },
+                    ],
+                    dom: 'Brtip',
+                    stateSave: true,
+                    scrollX: false,
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, 'Todos'],
+                    ],
+                }
+            );
+
+            Highcharts.chart('container-localidade', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Distribuição por Localidade'
+                },
+                xAxis: {
+                    categories: [{% for result in pessoas_local %} '{{ result.secao__escola__localidade|default_if_none:"SEM LOCALIDADE" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+                    crosshair: true
+                },
+                yAxis: {
+                    title: {
+                        useHTML: true,
+                        text: 'Nº de Pessoas'
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                },
+                series: [{
+                    name: 'Nº de Pessoas',
+                    data: [{% for result in pessoas_local %} {{ result.qtd }}{% if not forloop.last %},{% endif %}{% endfor %}]
+
+                }],
+                colors: ['#1F2937']
+            });
+            const table_escolas = $('#escola-list').DataTable(
+                {
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/pt-BR.json'
+                    },
+                    buttons: [
+                        {
+                            extend: 'copyHtml5',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            }
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            },
+                            download: "open",
+                            messageBottom: '\nTotal de Pessoas: {{ total }}'
+                        },
+                        {
+                            extend: 'print',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            },
+                            messageBottom: '<br><p class="lead"><strong>Total de Pessoas: {{ total }}</strong></p>',
+                        },
+                    ],
+                    dom: 'Brtip',
+                    stateSave: true,
+                    scrollX: false,
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, 'Todos'],
+                    ],
+                }
+            );
+
+            Highcharts.chart('container-escola', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Distribuição por Escola'
+                },
+                xAxis: {
+                    categories: [{% for result in pessoas_escola %} '{{ result.secao__escola__nome|default_if_none:"SEM ESCOLA" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+                    crosshair: true
+                },
+                yAxis: {
+                    title: {
+                        useHTML: true,
+                        text: 'Nº de Pessoas'
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                },
+                series: [{
+                    name: 'Nº de Pessoas',
+                    data: [{% for result in pessoas_escola %} {{ result.qtd }}{% if not forloop.last %},{% endif %}{% endfor %}]
+
+                }],
+                colors: ['#1F2937']
+            });
+
+            const table_cecoes = $('#secao-list').DataTable(
+                {
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/pt-BR.json'
+                    },
+                    buttons: [
+                        {
+                            extend: 'copyHtml5',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            }
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            },
+                            download: "open",
+                            messageBottom: '\nTotal de Pessoas: {{ total }}'
+                        },
+                        {
+                            extend: 'print',
+                            exportOptions: {
+                                columns: ":not(:contains('Ações'))"
+                            },
+                            messageBottom: '<br><p class="lead"><strong>Total de Pessoas: {{ total }}</strong></p>',
+                        },
+                    ],
+                    dom: 'Brtip',
+                    stateSave: true,
+                    scrollX: false,
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, 'Todos'],
+                    ],
+                }
+            );
+
+            Highcharts.chart('container-secao', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Distribuição por Seção'
+                },
+                xAxis: {
+                    categories: [{% for result in pessoas_secao %} '{{ result.secao_id|default_if_none:"SEM SEÇÃO" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+                    crosshair: true
+                },
+                yAxis: {
+                    title: {
+                        useHTML: true,
+                        text: 'Nº de Pessoas'
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                },
+                series: [{
+                    name: 'Nº de Pessoas',
+                    data: [{% for result in pessoas_secao %} {{ result.qtd }}{% if not forloop.last %},{% endif %}{% endfor %}]
+
+                }],
+                colors: ['#1F2937']
+            });
+            
         });
+    {% endlocalize %}
     </script>
 
 {% endblock javascripts %}

@@ -102,10 +102,13 @@
                             title: "Detalhes da Liderança {{ object.nome }}",
                             pageSize: 'A4',
                             download: "open",
+                            messageBottom: '\nTotal de Pessoas: {{ total }}'
+
                         },
                         {
                             extend: 'print',
                             title: "Detalhes da Liderança {{ object.nome }}",
+                            messageBottom: '<br><p class="lead"><strong>Total de Pessoas: {{ total }}</strong></p>'
                         },
                         {
                             extend: 'searchBuilder',

@@ -39,6 +39,7 @@
     <orderEntry type="library" name="datetime" level="application" />
     <orderEntry type="library" name="tabulator-tables" level="application" />
     <orderEntry type="library" name="Chart.js" level="application" />
+    <orderEntry type="library" name="highcharts" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />

@@ -278,5 +278,6 @@ class LiderancaDetailView(LoginRequiredMixin, DetailView):
                 "pessoas__secao__escola__localidade",
             )
         )
-        context = self.get_context_data(object=self.object, result=result)
+        total = Pessoa.objects.filter(lideranca=self.object).count()
+        context = self.get_context_data(object=self.object, result=result, total=total)
         return self.render_to_response(context)
