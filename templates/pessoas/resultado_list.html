@@ -1,4 +1,5 @@
 {% extends "layouts/base_2.html" %}
+{% load startswith %}
 
 {% block title %} Resultados {% endblock %}
 
@@ -60,7 +61,7 @@
                                 <tr>
                                     <td class="border-0">{{ object.nome }}</td>
                                     <td class="border-0">{{ object.localidade }}</td>
-                                    <td class="border-0">{{ object.qtd_pessoas }}</td>
+                                    <td class="border-0">{{ qtd_pessoas|get_value_dict:object.id }}</td>
                                     <td class="border-0">{{ object.qtd_keniston }}</td>
                                     <td class="border-0">{{ object.qtd_iran }}</td>
                                 </tr>

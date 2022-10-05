@@ -43,3 +43,8 @@ def get_query_parameters(val):
         result = result[0:-1]
         return result
     return val
+
+
+@register.filter("get_value_dict")
+def get_value_dict(dictionary, key):
+    return dictionary.get(key)

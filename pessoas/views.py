@@ -285,22 +285,27 @@ class LiderancaDetailView(LoginRequiredMixin, DetailView):
 
 class ResultadoListView(LoginRequiredMixin, ListView):
     model = Escola
-    queryset = Escola.objects.prefetch_related(
-        "secoes__resultado__postulante"
-    ).annotate(
+    queryset = Escola.objects.annotate(
         qtd_keniston=Sum(
             "secoes__resultado__quantidade",
             filter=Q(secoes__resultado__postulante__nome="KENISTON"),
-            distinct=True,
         ),
         qtd_iran=Sum(
             "secoes__resultado__quantidade",
             filter=Q(secoes__resultado__postulante__nome="IRAN LIMA"),
-            distinct=True,
-        ),
-        qtd_pessoas=Count(
-            "secoes__pessoas",
-            distinct=True,
         ),
     )
     template_name = "pessoas/resultado_list.html"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        kwargs["qtd_pessoas"] = {
+            escola["id"]: escola["qtd_pessoas"]
+            for escola in Escola.objects.annotate(
+                qtd_pessoas=Count(
+                    "secoes__pessoas",
+                    distinct=True,
+                )
+            ).values("id", "qtd_pessoas")
+        }
+
+        return super().get_context_data(**kwargs)
