@@ -3,7 +3,7 @@ import unicodedata
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models import Count
+from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -18,7 +18,7 @@ from django.views.generic import (
 )
 
 from pessoas.forms import SendPlanilhaPessoaForm
-from pessoas.models import Pessoa, Secao, Lideranca
+from pessoas.models import Pessoa, Secao, Lideranca, Escola
 
 
 def sanitize_str(texto):
@@ -281,3 +281,26 @@ class LiderancaDetailView(LoginRequiredMixin, DetailView):
         total = Pessoa.objects.filter(lideranca=self.object).count()
         context = self.get_context_data(object=self.object, result=result, total=total)
         return self.render_to_response(context)
+
+
+class ResultadoListView(LoginRequiredMixin, ListView):
+    model = Escola
+    queryset = Escola.objects.prefetch_related(
+        "secoes__resultado__postulante"
+    ).annotate(
+        qtd_keniston=Sum(
+            "secoes__resultado__quantidade",
+            filter=Q(secoes__resultado__postulante__nome="KENISTON"),
+            distinct=True,
+        ),
+        qtd_iran=Sum(
+            "secoes__resultado__quantidade",
+            filter=Q(secoes__resultado__postulante__nome="IRAN LIMA"),
+            distinct=True,
+        ),
+        qtd_pessoas=Count(
+            "secoes__pessoas",
+            distinct=True,
+        ),
+    )
+    template_name = "pessoas/resultado_list.html"

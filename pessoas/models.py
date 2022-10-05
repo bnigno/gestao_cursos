@@ -49,3 +49,20 @@ class Pessoa(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class Postulante(models.Model):
+    nome = models.CharField(max_length=500, verbose_name="Nome", unique=True)
+
+
+class Resultado(models.Model):
+    secao = models.ForeignKey(
+        Secao, on_delete=models.CASCADE, related_name="resultado", verbose_name="Seção"
+    )
+    quantidade = models.IntegerField(verbose_name="Quantidade")
+    postulante = models.ForeignKey(
+        Postulante,
+        on_delete=models.CASCADE,
+        related_name="resultado",
+        verbose_name="Postulante",
+    )

@@ -71,6 +71,15 @@
                           <span class="sidebar-text">Estatísticas Pessoas</span>
                       </a>
                   </li>
+                </li>
+                    <li class="nav-item {% if request.path|startswith:'/resultados/' %} active {% endif %}">
+                      <a href="{% url 'listar-resultado' %}" class="nav-link">
+                  <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
+                      <i class="icon icon-xs me-2  fa-solid fa-file-lines"></i>
+                  </span>
+                          <span class="sidebar-text">Resultados</span>
+                      </a>
+                  </li>
 
                   <li class="nav-item">
                       <a

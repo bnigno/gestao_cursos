@@ -38,4 +38,5 @@ urlpatterns = [
         views.LiderancaDetailView.as_view(),
         name="detalhes_lideranca",
     ),
+    path("resultados/", views.ResultadoListView.as_view(), name="listar-resultado"),
 ]
