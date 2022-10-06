@@ -18,7 +18,7 @@ from django.views.generic import (
 )
 
 from pessoas.forms import SendPlanilhaPessoaForm
-from pessoas.models import Pessoa, Secao, Lideranca, Escola
+from pessoas.models import Pessoa, Secao, Lideranca, Escola, Resultado
 
 
 def sanitize_str(texto):
@@ -307,5 +307,16 @@ class ResultadoListView(LoginRequiredMixin, ListView):
                 )
             ).values("id", "qtd_pessoas")
         }
+        kwargs["total_pessoas"] = Pessoa.objects.count()
+        kwargs["total_keniston"] = (
+            Resultado.objects.filter(postulante__nome="KENISTON")
+            .aggregate(total=Sum("quantidade"))
+            .get("total")
+        )
+        kwargs["total_iran"] = (
+            Resultado.objects.filter(postulante__nome="IRAN LIMA")
+            .aggregate(total=Sum("quantidade"))
+            .get("total")
+        )
 
         return super().get_context_data(**kwargs)
